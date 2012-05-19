@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Message xmlns="http://id.piratenpartei.de/message"><Body xmlns:ns0="http://id.piratenpartei.de/message" id="body" ns0:author="WFFQCMK3ORMSK7J2WLPYUMCKZ6UDXGXD7GPWDMCBIRIOB2Z4L44IWOH4SNI6E7ABQPLANO2E3JP6SRY7SRFTKDTA3JUVWRKRA746CKA="><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><KeyValue><DSAKeyValue><P>/X9TgR11EilS30qcLuzk5/YRt1I870QAwx4/gLZRJmlFXUAiUftZPY1Y+r/F9bow9subVWzXgTuA
+HTRv8mZgt2uZUKWkn5/oBHsQIsJPu6nX/rfGG/g7V+fGqKYVDwT7g/bTxR7DAjVUE1oWkTL2dfOu
+K2HXKu/yIgMZndFIAcc=</P><Q>l2BQjxUjC8yykrmCouuEC/BYHPU=</Q><G>9+GghdabPd7LvKtcNrhXuXmUr7v6OuqC+VdMCz0HgmdRWVeOutRZT+ZxBxCBgLRJFnEj6EwoFhO3
+zwkyjMim4TwWeotUfI0o4KOuHiuzpnWRbqN/C/ohNWLx+2J6ASQ7zKTxvqhRkImog9/hWuWfBpKL
+Zl6Ae1UlZAFMO/7PSSo=</G><Y>DqT5+9UF9v6KRUr+VbkEBZ6mZylK7o7nKhsJ8qLQ50KL4gIjDdwHfNskW1ZTsc79siwQbXMinngL
+NRAz0+SS359GiJ/drtGJtw0hp1U3WWYSf1mGXKkcOw2Mpg1aBvnGU50iHSk5jJ0boAEg9LDXxtsz
+xLnsiYUd5Qz1wjjC4PU=</Y></DSAKeyValue></KeyValue></KeyInfo></Body><Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/><Reference URI="#body"><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512"/><DigestValue>C6nIAdvOAEQWjFsnq7Px1dFoeOw53Tv74ESTFJxUQOFZeMM5mZgGqhpgDhxGXjoR2ErVrC1/hDDO
+tcgrDD3PJw==</DigestValue></Reference></SignedInfo><SignatureValue>G8nlkSc4Sf4usRJbBc1YTeNdAxY916ipJhXGTsUwPkMkdrKXxQyLMQ==</SignatureValue><KeyInfo><KeyValue><DSAKeyValue><P>/X9TgR11EilS30qcLuzk5/YRt1I870QAwx4/gLZRJmlFXUAiUftZPY1Y+r/F9bow9subVWzXgTuA
+HTRv8mZgt2uZUKWkn5/oBHsQIsJPu6nX/rfGG/g7V+fGqKYVDwT7g/bTxR7DAjVUE1oWkTL2dfOu
+K2HXKu/yIgMZndFIAcc=</P><Q>l2BQjxUjC8yykrmCouuEC/BYHPU=</Q><G>9+GghdabPd7LvKtcNrhXuXmUr7v6OuqC+VdMCz0HgmdRWVeOutRZT+ZxBxCBgLRJFnEj6EwoFhO3
+zwkyjMim4TwWeotUfI0o4KOuHiuzpnWRbqN/C/ohNWLx+2J6ASQ7zKTxvqhRkImog9/hWuWfBpKL
+Zl6Ae1UlZAFMO/7PSSo=</G><Y>DqT5+9UF9v6KRUr+VbkEBZ6mZylK7o7nKhsJ8qLQ50KL4gIjDdwHfNskW1ZTsc79siwQbXMinngL
+NRAz0+SS359GiJ/drtGJtw0hp1U3WWYSf1mGXKkcOw2Mpg1aBvnGU50iHSk5jJ0boAEg9LDXxtsz
+xLnsiYUd5Qz1wjjC4PU=</Y></DSAKeyValue></KeyValue></KeyInfo></Signature></Message>

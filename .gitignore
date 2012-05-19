@@ -1,0 +1,5 @@
+bin
+third_party
+.project
+.classpath
+logging.properties
