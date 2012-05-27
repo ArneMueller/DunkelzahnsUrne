@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:m="http://id.piratenpartei.de/message"        
+        xmlns:sig="http://www.w3.org/2000/09/xmldsig#"
+        targetNamespace="http://id.piratenpartei.de/message"
+        elementFormDefault="qualified">
+  <import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="http://www.w3.org/2000/09/xmldsig#"/>
+  <element name="Message">
+    <complexType>
+      <sequence>
+        <element ref="Body"/>
+        <element ref="sig:Signature"/>
+      </sequence>
+    </complexType>
+  </element>
+  <element name="Body">
+    <complexType>
+      <complexContent>
+        <restriction base="anyType">
+           <attribute name="author" type="string"  use="required"/>
+        </restriction>
+      </complexContent>
+    </complexType>
+  </element>
+</schema>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:leg="http://id.piratenpartei.de/legitimate"        
+        targetNamespace="http://id.piratenpartei.de/legitimate"
+        elementFormDefault="qualified">
+  <element name="Accounts">
+    <complexType>
+      <sequence>
+        <element ref="leg:Account" maxOccurs="unbounded"/>
+      </sequence>
+    </complexType>
+  </element>
+  <element name="Account">
+    <complexType>
+      <attribute name="id" type="ID" use="required"/>
+    </complexType>
+  </element>
+</schema>

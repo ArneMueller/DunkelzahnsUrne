@@ -206,6 +206,7 @@ public class Message {
 	 * @throws VerificationException
 	 */
 	public void verify() throws VerificationException {
+		// TODO: Change to only look at Signature element child of root node
 		NodeList nl = doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 		if (nl.getLength() == 0) {
 			throw new VerificationException("Nachricht enthält keine Signatur");

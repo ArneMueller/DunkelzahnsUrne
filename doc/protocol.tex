@@ -1,0 +1,276 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fancyhdr}
+%\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{enumerate}
+%\usepackage{listings}
+%\usepackage[rflt]{floatflt}
+%\usepackage{tikz}
+%\usepackage{wrapfig}
+%\usepackage[standard, thmmarks]{ntheorem}
+%\usepackage{algorithm}
+%\usepackage{algorithmic}
+%\usepackage{algorithm2e}
+%\usepackage{subfigure}
+%\usepackage{mathbbol}
+\usepackage{listings}
+\usepackage[pdfborder={0 0 0}]{hyperref}
+
+
+%\lstset{numbers=left, numberstyle=\tiny, basicstyle=\footnotesize, numbersep=5pt}
+%\lstset{extendedchars,inputencoding=utf8}
+%\lstset{tabsize=2,breaklines}
+%\lstset{language=}
+%\renewcommand{\lstlistingname}{Quelltext}
+
+\geometry{left=2cm, top=3cm, right=2cm, bottom=2.5cm}
+
+%\renewcommand{\headrulewidth}{0.4pt} 
+%\renewcommand{\footrulewidth}{0.4pt}
+
+\pagestyle{fancy}
+
+%\newcommand{\qed}{\hfill \ensuremath{\Box}}
+
+\newcommand{\wiki}[2]{\href{http://wiki.piratenpartei.de/#1}{#2}}
+\newcommand{\mytitle}{ Die Akkreditierungsurne }
+
+\newcommand{\im}{\mathrm{im}\;}
+\newcommand{\vol}{\text{vol}}
+\newcommand{\conv}{\text{conv}}
+\newcommand{\lin}{\text{lin}}
+\newcommand{\cone}{\text{cone}}
+\newcommand{\aff}{\text{aff}}
+\newcommand{\rec}{\text{rec}}
+\newcommand{\lineal}{\text{lineal}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\face}{\text{face}}
+\newcommand{\row}{\text{row}}
+\newcommand{\col}{\text{col}}
+\newcommand{\sign}{\text{sign}}
+\newcommand{\proj}{\mathrm{proj}}
+\newcommand{\dom}{\mathrm{dom}\;}
+
+\newcommand{\mat}[2]{\left( \begin{array}{#1}#2\end{array} \right)}
+
+\lstset{language=XML}
+\lstset{frame=single, breaklines}
+
+
+%opening
+\title{\mytitle}
+\author{AG Liquid Democracy, Ansprechpartner: \wiki{Benutzer:Wobble}{Wobble}, \wiki{Benutzer:Dunkelzahn}{Dunkelzahn}, \wiki{Benutzer:moonopool}{moonopool}}
+
+\lhead{Vorschlag der AG Liquid Democracy}
+\chead{\mytitle}
+\rhead{\today}
+
+%\theoremstyle{nonumberplain}
+% \newtheorem{claim}{Claim}[section]
+% \newtheorem{observation}{Observation}[section]
+% \newtheorem{problem}{Problem}[section]
+% \newtheorem{conjecture}{Conjecture}[section]
+
+\begin{document}
+
+\parindent 0em
+\parskip 0.5em
+
+% Umfang: 5 Seiten!
+
+\maketitle
+
+\tableofcontents
+
+\section{Einleitung}
+Dieses Dokument definiert formal welche Komponente wie auf Anfragen etc. reagieren muss bzw. kann. In Abschnitt \ref{sec:datentypen} werden die Datentypen, die zum Informationsaustausch genutzt werden definiert. In Abschnitt \ref{sec:verfahren} werden die einzelnen Verfahrensschritte definiert. 
+
+Dabei werden folgende Schlüsselworte (in Großbuchstaben) genutzt:
+\begin{itemize}
+ \item MUSS beschreibt eine Anforderung, die unbedingt zu erfüllen ist. Verletzungen von ``MUSS-Anforderungen`` müssen nicht verhinderbar aber durch dritte dokumentierbar sein.
+ Eine Nichterfüllung kann zur Bestrafung des Betreibers der Komponente führen.
+ \item SOLL beschreibt eine Anforderung, die für einen ordnungsgemäßen Ablauf erforderlich ist. Eine Verletzung einer ``SOLL-Anforderung'' muss nicht durch dritte dokumentierbar sein, wird aber in der Regel zu einer Fehlermeldung in einem Nachfolgeschritt des Ablaufes führen. Verletzungen von ``SOLL-Anforderungen'' sind nicht zu bestrafen.
+ \item SOLL NICHT beschreibt eine Aktion, durch deren Umsetzung Eigenschaften des Verfahrens für den Komponentenbetreiber verloren gehen aber keine Auswirkungen auf andere Komponenten haben. Verletzungen von ``SOLL NICHT-Anforderungen'' sind nicht zu bestrafen.
+ \item DARF NICHT beschreibt eine Aktion, die wesentliche Eigenschaften des Systems gefährdet. Verletzungen von ``DARF NICHT''-Anforderungen können bestraft werden.
+\end{itemize}
+
+
+\section{Datentypen} \label{sec:datentypen}
+\subsection{Base32Encoding eines Byte-Array}
+Gegeben ein Byte-Array $b$. Sei $s$ das Base32 encoding von $b$ gemäß \href{https://www.ietf.org/rfc/rfc4648.txt}{www.ietf.org/rfc/rfc4648.txt}. Sei $w$ der String, den man erhält, wenn man bei $s$ jedes '=' durch '\_' ersetzt. 
+Dann ist $\_w$ definiert als das Base32Encoding von $b$.
+
+TODO: Change Implementation
+
+\paragraph{Begründung}
+Die Hashes der öffentlichen Schlüssel werden als Identifikationsmerkmal des Autors genutzt. Dieses Identifikationsmerkmal wird in ID-Attributen benutzt und muss daher ein \href{http://www.w3.org/TR/xml11/#NT-Name}{bestimmtes Format} haben.
+
+Mit diesem Encoding hat ein 512bit String eine Länge von 105 Zeichen, kann also getwittert werden.
+
+\subsection{Liste verifizierter Accounts}
+Jede Liste verifizierter Accounts validiert gegen folgendes XML-Schema:
+\lstinputlisting{../xsd/legitimated.xsd}
+
+Jeder Hash, dessen Base32Encoding als id-Attribut eines Account-Elements in einer Liste verifizierter Accounts $L$  eingetragen ist, gilt als \emph{verifiziert nach $L$}.
+
+\subsection{Öffentlicher Schlüssel} \label{sec:publicKey}
+Ein Öffentlicher Schlüssel im Sinne dieser Spezifikation ist ein \texttt{KeyInfo} Element gemäß \url{http://www.w3.org/TR/xmldsig-core/#sec-KeyInfo}, welches genau ein \texttt{KeyValue} Element enthält und sonst keine weiteren Elemente. Das \texttt{KeyValue} Element muss einen DSA-Schlüssel (gemäß \url{http://www.w3.org/2000/09/xmldsig#DSAKeyValue}) codieren.
+
+\subsubsection{Hash eines öffentlichen Schlüssels}
+Sei $s$ die exclusive canonicalization (gemäß \url{http://www.w3.org/TR/2002/REC-xml-exc-c14n-20020718/}) ohne InclusiveNamespaces des \texttt{KeyValue} Elements.
+
+Der Hash des öffentlichen Schlüssels ist das Base32Encoding des SHA-512-Hashes (gemäß \url{http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf}) von $s$.
+
+TODO: Change implementation
+
+\subsection{Liste registrierter Accounts}
+Jede Liste registrierter Accounts validiert gegen folgendes XML-Schema:
+\lstinputlisting{../xsd/registered.xsd}
+
+Jeder Hash, dessen Base32Encoding als id-Attribut eines gültigen Account-Elements in einer Liste registrierter Accounts $L$  eingetragen ist, gilt als \emph{registriert nach $L$}. 
+Ein Account-Element ist gültig, falls
+\begin{itemize}
+ \item das enthaltene \texttt{sig:KeyInfo} Element ein öffentlicher Schlüssel gemäß Abschnitt \ref{sec:publicKey} ist.
+ \item der Hash des öffentlichen Schlüssels mit dem Wert des id-Attributs übereinstimmt.
+\end{itemize}
+
+\subsection{Nachricht}
+Jede Nachricht validiert gegen folgendes XML-Schmea:
+\lstinputlisting{../xsd/message.xsd}
+
+Eine Nachricht ist \emph{gültig} gegenüber einer Liste registrierter Accounts $R$, falls
+\begin{itemize}
+ \item der Hash \texttt{/Message/Body@author} nach $R$ registriert ist.
+ \item Die Signatur (\texttt{/Message/Signature}) gegen den öffentlichen Schlüssel, der in $R$ für den Hash \texttt{/Message/Body@author} gespeichert ist, verifiziert.
+ \item Die Signatur (\texttt{/Message/Signature}) genau eine Referenz enthält, wobei
+ \begin{itemize}
+  \item die URI der Referenz genau \texttt{"/Message/Body"} ist.
+  \item die Referenz keine expliziten Transformationen benennt
+  \item \href{http://www.w3.org/2001/04/xmlenc#sha512}{SHA-512} als DigestMethod benutzt.
+ \end{itemize}
+\end{itemize}
+
+Eine Nachricht ist \emph{verifiziert} gegenüber einer Liste verifizierter Accounts $V$, falls der Hash \texttt{/Message/Body@author} nach $V$ verifiziert ist.
+
+TODO:change implementation
+
+\subsection{Account-Erstellungs-Nachricht}
+Eine Nachricht ist eine Account-Erstellungs-Nachricht, falls \texttt{/Message/Body} genau ein Element enthält, welches ein öffentlicher Schlüssel (nach Abschnitt \label{sec:publickKey}) ist. 
+Die Account-Erstellungs-Nachricht ist gültig, 
+\begin{itemize}
+ \item falls \texttt{/Message/Body@author} mit dem Hash des öffentlichen Schlüssels übereinstimmt.
+ \item Die Signatur (\texttt{/Message/Signature}) gegen den im Body gespeicherten öffentlichen Schlüssel verifiziert.
+ \item Die Signatur (\texttt{/Message/Signature}) genau eine Referenz enthält, wobei
+ \begin{itemize}
+  \item die URI der Referenz genau \texttt{"/Message/Body"} ist.
+  \item die Referenz keine expliziten Transformationen benennt
+  \item \href{http://www.w3.org/2001/04/xmlenc#sha512}{SHA-512} als DigestMethod benutzt.
+ \end{itemize}
+\end{itemize}
+
+\subsubsection{Hash der Nachricht}
+Der Hash der Nachricht ist der Wert des Attributs \texttt{/Message/Body@author}.
+
+\subsubsection{Schlüssel der Nachricht}
+Der Schlüssel der Nachricht ist das Element \texttt{/Message/Body/KeyInfo}.
+
+\subsection{Akkreditierungsbrief}
+Der Akkreditierungsbrief ist ein auf Papier gedruckter Hash des öffentlichen Schlüssels. Konkret ist enthalten:
+\begin{itemize}
+ \item Der Hash als Text in Base32Encoding
+ \item Der Hash als QR-CODE (TODO:genauer)
+\end{itemize}
+
+
+\section{Verfahren} \label{sec:verfahren}
+Das System ist in die folgenden Komponenten aufgeteilt:
+\begin{itemize}
+ \item Verification-Server: Dieser stellt eine Liste der verifizierten Hashes bereit
+ \item Account-Server: Dieser verwaltet die Liste aller registrierten Accounts
+ \item Urne: Die Urne dient der Sammlung der Hashes der öffentlichen Schlüssel
+ \item Client: Jeder Pirat betreibt einen Client
+\end{itemize}
+
+\subsection{Komponente: Verification-Server}
+Der Verification-Server verwaltet die offizielle Liste der verifizierten Accounts, welche durch den Urnengang verifiziert wurde.
+\subsubsection{statisches Verhalten}
+\begin{itemize}
+ \item Der Verification-Server MUSS auf einem wohldefinierten Ort die offizielle Liste der verifizierten Accounts veröffentlichen.
+\end{itemize}
+
+
+\subsection{Komponente: Account-Server}
+Der Account-Server verwaltet die offizielle Liste der registrierten Accounts, welche sich bis jetzt registriert haben.
+\subsubsection{statisches Verhalten}
+\begin{itemize}
+ \item Der Account-Server MUSS auf einem wohldefinierten Ort die offizielle Liste der registrierten Accounts veröffentlichen.
+\end{itemize}
+
+\subsubsection{Empfang einer Nachricht $m$ }
+\begin{itemize}
+ \item Der Account-Server MUSS prüfen, ob $m$ eine gültig Account-Erstellungs-Nachricht ist.
+ \item Ist $m$ eine gültige Account-Erstellungs-Nachricht, so MUSS der Account-Server in der offizielle Liste der registrierten Accounts einen Eintrag unter dem Hash von $m$ mit dem Schlüssel von $m$ erstellen. Falls schon ein Eintrag mit dem Hash von $m$ existiert, so MUSS der existierende Eintrag überschrieben werden.
+ \item Ist $m$ keine gültige Account-Erstellungs-Nachricht, so DARF die offizielle Liste der registrierten Accounts NICHT modifiziert werden.
+\end{itemize}
+
+\paragraph{Begründung}
+Nachrichten müssen auf Gültigkeit geprüft werden, damit dritte nicht die Account-Details Fremder überschreiben.
+
+Durch den öffentlich sichtbaren Effekt der Nachricht (Aktualisierung der registrierten Accounts), ist keine weitere besondere Antwort-Nachricht nötig. Mmh... dann sollte diese offizielle Liste vom Account-Server signiert werden.
+
+
+\subsection{Komponente: Client}
+Mit dem Client können neue Accounts erstellt werden und Nachrichten versendet werden.
+\subsubsection{Account erstellen}
+\begin{itemize}
+ \item Der Client erstellt einen neues Schlüsselpaar mit privaten Schlüssel $p$ und öffentlichen Schlüssel $q$.
+ \item Der Client SOLL das Schlüsselpaar auf einem privaten aber zugänglichen Ort speichern.
+ \item Der Client SOLL den privaten Schlüssel NICHT veröffentlichen.
+ \item Der Client SOLL den öffentlichen Schlüssel NICHT in einer Form veröffentlichen, die es ermöglicht Schlussfolgerungen auf den Inhaber des öffentlichen Schlüssels zu ziehen.
+\end{itemize}
+
+\subsubsection{Account registrieren}
+\begin{itemize}
+ \item Der Client SOLL eine Account-Erstellungs-Nachricht aus dem öffentlichen Schlüssel $q$ erstellen und dem Account-Server senden. Die Nutzung von \href{https://www.torproject.org/}{Tor} wird empfohlen.
+ \item Der Client SOLL überprüfen, ob der Account-Server die öffentliche Datenbank aktualisiert hat und eine Kopie speichern. Die Nutzung von \href{https://www.torproject.org/}{Tor} wird empfohlen (dabei eine andere Route als beim vorherigen Schritt benutzen).
+\end{itemize}
+
+\subsubsection{Account akkreditieren}
+\begin{itemize}
+ \item Der Client SOLL einen Akkreditierungsbrief mit dem öffentlichen Schlüssel $q$ drucken.
+ \item Der Client SOLL den Akkreditierungsbrief NICHT veröffentlichen. 
+ \item Der Client SOLL sich auf einer Mitgliederversammlung akkreditieren.
+ \item Der Client MUSS den Akkreditierungsbrief in die Urne werfen. (siehe Abschnitt \ref{sec:urne_einwerfen})
+\end{itemize}
+
+\subsubsection{Nachricht verifzieren}
+Dies macht der Client um die Nachrichten (z.B. Stimmabgaben anderer Nutzer auf ihre Authentizität zu überprüfen)
+\begin{itemize}
+ \item Der Client SOLL sich den Hash der offiziellen Liste der verifizierten Accounts besorgen (z.B. als Wahlbeobachter bei der Auszählung der Stimmzettel, oder über ein WebOfTrust)
+ \item Der Client SOLL die offizielle Liste der verifizierten Accounts herunterladen und mit dem Hash auf Modifikationen überprüfen.
+ \item Der Client SOLL prüfen, ob der Hash des Autors auch in der Liste der verifizierten Accounts enthalten ist.
+ \item Der Client SOLL prüfen, ob die Nachricht gültig gemäß der offiziellen Liste der registrierten Accounts vom Account-Server ist.
+\end{itemize}
+
+\subsection{Komponente: Urne}
+\subsubsection{Akkreditierungsbrief in die Urne werfen} \label{sec:urne_einwerfen}
+\begin{itemize}
+ \item Die Akkreditierungskommission MUSS überprüfen, ob der Client stimmberechtigt ist.
+ \item Die Akkreditierungskommission MUSS überprüfen, dass noch kein Vermerk existiert, dass der Client schon einen Akkreditierungsbrief in die Urne geworfen hat.
+ \item Ist der Client stimmberechtigt und hat noch keinen Akkreditierungsbrief in die Urne geworfen, so MUSS die Akkreditierungskommission dem Client erlauben den Akkreditierungsbrief in die Urne zu werfen.
+ \item Der Client MUSS den Akkreditierungsbrief in die Urne werfen.
+ \item Die Akkreditierungskommission MUSS vermerken, dass der Client schon einen Akkreditierungsbrief in die Urne geworfen hat.
+\end{itemize}
+
+
+\end{document}
+
+%\bibliographystyle{plain}
+%\bibliography{../thermo}
+
+\end{document}
