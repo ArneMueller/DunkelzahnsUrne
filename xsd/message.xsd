@@ -8,18 +8,18 @@
   <element name="Message">
     <complexType>
       <sequence>
-        <element ref="Body"/>
+        <element ref="m:Body"/>
         <element ref="sig:Signature"/>
       </sequence>
     </complexType>
   </element>
   <element name="Body">
     <complexType>
-      <complexContent>
-        <restriction base="anyType">
-           <attribute name="author" type="string"  use="required"/>
-        </restriction>
-      </complexContent>
+		<sequence>
+			<any minOccurs="1" maxOccurs="unbounded" processContents="skip"/>
+		</sequence>
+		<attribute name="author" type="string"  use="required"/>
+		<attribute name="id" type="ID" use="required"/>
     </complexType>
   </element>
 </schema>

@@ -36,8 +36,8 @@ public class LegitimizedAccounts {
 		}
 		DocumentBuilder builder;
 		try {
-			//TODO: set Schema
 			builder = dbf.newDocumentBuilder();
+			builder.setErrorHandler(new ParseErrorHandler());
 			
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			InputStream in = Config.legitimatedAccounts.openStream();
@@ -85,9 +85,6 @@ public class LegitimizedAccounts {
 	}
 	
 	public boolean hasEntry(String hash) {
-		// delete the last character which is always "=" and invalid for xml-IDs
-		// attach a _ so it never starts with a number
-		hash = "_"+hash.substring(0, hash.length()-1);
 		Element e = doc.getElementById(hash);
 		return( e != null);
 	}

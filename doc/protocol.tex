@@ -149,7 +149,7 @@ Eine Nachricht ist \emph{gültig} gegenüber einer Liste registrierter Accounts 
  \item Die Signatur (\texttt{/Message/Signature}) gegen den öffentlichen Schlüssel, der in $R$ für den Hash \texttt{/Message/Body@author} gespeichert ist, verifiziert.
  \item Die Signatur (\texttt{/Message/Signature}) genau eine Referenz enthält, wobei
  \begin{itemize}
-  \item die URI der Referenz genau \texttt{"/Message/Body"} ist.
+  \item die URI der Referenz genau \texttt{"\#body"} ist.
   \item die Referenz keine expliziten Transformationen benennt
   \item \href{http://www.w3.org/2001/04/xmlenc#sha512}{SHA-512} als DigestMethod benutzt.
  \end{itemize}
@@ -167,7 +167,7 @@ Die Account-Erstellungs-Nachricht ist gültig,
  \item Die Signatur (\texttt{/Message/Signature}) gegen den im Body gespeicherten öffentlichen Schlüssel verifiziert.
  \item Die Signatur (\texttt{/Message/Signature}) genau eine Referenz enthält, wobei
  \begin{itemize}
-  \item die URI der Referenz genau \texttt{"/Message/Body"} ist.
+  \item die URI der Referenz genau \texttt{"\#body"} ist.
   \item die Referenz keine expliziten Transformationen benennt
   \item \href{http://www.w3.org/2001/04/xmlenc#sha512}{SHA-512} als DigestMethod benutzt.
  \end{itemize}

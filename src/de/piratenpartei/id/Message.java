@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.XMLConstants;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.URIReferenceException;
@@ -41,6 +42,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.validation.SchemaFactory;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -59,33 +61,33 @@ public class Message {
 	public Message(InputStream in) throws IOException, SAXException, KeyException {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance(); 
 		dbf.setNamespaceAware(true); 
+		dbf.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(Config.messageSchema));
+		//dbf.setValidating(true);
 		//TODO: Schema für den envelope (damit die Body-Id auch als solche erkannt wird.)
 		DocumentBuilder builder;
 		try {
 			builder = dbf.newDocumentBuilder();
+			builder.setErrorHandler(new ParseErrorHandler());
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}  
 		doc = builder.parse(in);
 		
 		findBodyElements();
-
+		
+		if(!body.getAttribute("id").equals("body")) {
+			throw new SAXException("the id attribute of the Body element does not have the value \"body\"");
+		}
 		// get sender
-		String hash = body.getAttributes().getNamedItemNS(Config.messageNamespace, "author").getNodeValue();
+		String hash = body.getAttribute("author");
 		author = new Account(hash);
 	}
 	
 	private void findBodyElements() throws IOException {
 		// get message root (which should contain body and signature)
-		NodeList rnl = doc.getElementsByTagNameNS(Config.messageNamespace, "Message");
-		if (rnl.getLength() == 0) {
-			throw new IOException("Nachricht enthält kein Element \"Message\"");
-		} 
-		if (rnl.getLength() > 1) {
-			throw new IOException("Nachricht enthält mehr als ein Element \"Message\"");
-		}
-		root = (Element) rnl.item(0);
-		
+		root = doc.getDocumentElement();
+		assert(root.getNamespaceURI().equals(Config.messageNamespace) && root.getNodeName().equals("Message"));
+
 		// get message body
 		NodeList nl = doc.getElementsByTagNameNS(Config.messageNamespace, "Body");
 		if (nl.getLength() == 0) {
@@ -95,12 +97,18 @@ public class Message {
 			throw new IOException("Nachricht enthält mehr als einen Textteil");
 		}
 		body = (Element) nl.item(0);
+
 	}
 	
 	// creates a new empty message
 	public Message() {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
+		try {
+			dbf.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(Config.messageSchema));
+		} catch (SAXException e) {
+			throw new RuntimeException(e);
+		}
 		DocumentBuilder db;
 		try {
 			db = dbf.newDocumentBuilder();
@@ -131,13 +139,15 @@ public class Message {
 	 */
 	public void sign(PrivateAccount account) throws KeyException {
 		author = account;
-		body.setAttributeNS(Config.messageNamespace, "author", author.getHash());
+		body.setAttribute("author", author.getHash());
 		
-		// first get rid of old signatures
-		NodeList nl = doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
+		// first get rid of old signatures (but only the ones located directly below the root node)
+		NodeList nl = doc.getDocumentElement().getChildNodes();
 		for(int i = 0; i < nl.getLength(); i++) {
-			Node n = nl.item(0);
-			n.getParentNode().removeChild(n);
+			Node n = nl.item(i);
+			if(n.getNamespaceURI().equals(XMLSignature.XMLNS) && n.getNodeName().equals("Signature")) {
+				n.getParentNode().removeChild(n);
+			}
 		}
 		
 		
@@ -149,6 +159,7 @@ public class Message {
 	        // Prepare the output file
 	        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance(); 
 			dbf.setNamespaceAware(true); 
+			dbf.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(Config.messageSchema));
 			Document doc2 = dbf.newDocumentBuilder().newDocument();
 	        DOMResult result = new DOMResult(doc2);
 	
@@ -169,8 +180,9 @@ public class Message {
 	    } catch (TransformerException e) {
 	    	throw new RuntimeException(e);
 	    } catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	    	throw new RuntimeException(e);
+		} catch (SAXException e) {
+	    	throw new RuntimeException(e);
 		} 
 		
 		XMLSignatureFactory xsf = XMLSignatureFactory.getInstance();
@@ -207,16 +219,17 @@ public class Message {
 	 */
 	public void verify() throws VerificationException {
 		// TODO: Change to only look at Signature element child of root node
-		NodeList nl = doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
-		if (nl.getLength() == 0) {
+		Node signature = null;
+		NodeList nl = doc.getDocumentElement().getChildNodes();
+		for(int i = 0; i < nl.getLength(); i++) {
+			Node n = nl.item(i);
+			if(n.getNamespaceURI().equals(XMLSignature.XMLNS) && n.getNodeName().equals("Signature")) {
+				signature = n;
+			}
+		}
+		if (signature == null) {
 			throw new VerificationException("Nachricht enthält keine Signatur");
 		} 
-		if (nl.getLength() > 1) {
-			throw new VerificationException("Nachricht enthält zu viele Signaturen");
-		}
-		
-		// Load signature from XML document
-		Node signature = nl.item(0);
 		
 		DOMValidateContext valContext = new DOMValidateContext(author.getPublicKey(), signature); 
 		
@@ -283,8 +296,8 @@ public class Message {
 		Reference ref = (Reference) refs.get(0);
 		
 		// check, if ref really references the body of the message
-		if(!ref.getURI().equals("#"+body.getAttribute("id"))) {
-			throw new VerificationException("Die Signatur signiert nicht den Körper der Nachricht, sondern irgendwas anderes!");
+		if(!ref.getURI().equals("#body")) {
+			throw new VerificationException("Die Signatur signiert nicht den Körper (\"/Message/Body\") der Nachricht, sondern irgendwas anderes!");
 		}
 		
 		// check, if the reference does not erase important data by using a transformation

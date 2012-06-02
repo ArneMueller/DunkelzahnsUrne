@@ -37,6 +37,7 @@ public class PublishedAccounts {
 		DocumentBuilder builder;
 		try {
 			builder = dbf.newDocumentBuilder();
+			builder.setErrorHandler(new ParseErrorHandler());
 			doc = builder.parse(Config.publishedAccounts.openStream());
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
@@ -58,9 +59,6 @@ public class PublishedAccounts {
 	 * @throws KeyException
 	 */
 	public KeyValue getKey(String hash) throws KeyException {
-		// delete the last character which is always "=" and invalid for xml-IDs
-		// attach a _ so it never starts with a number
-		hash = "_"+hash.substring(0, hash.length()-1);
 		KeyInfoFactory factory = KeyInfoFactory.getInstance();
 		Element node = doc.getElementById(hash);
 		if(node == null) {
@@ -98,9 +96,6 @@ public class PublishedAccounts {
 	 * @return
 	 */
 	public boolean hasKey(String hash) {
-		// delete the last character which is always "=" and invalid for xml-IDs
-		// attach a _ so it never starts with a number
-		hash = "_"+hash.substring(0, hash.length()-1); 
 		KeyInfoFactory factory = KeyInfoFactory.getInstance();
 		Element node = doc.getElementById(hash);
 		if(node == null) {

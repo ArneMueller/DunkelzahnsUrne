@@ -9,18 +9,21 @@ import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.SignatureMethod;
 
+import org.apache.xml.security.Init;
+
 public class Config {
 
 	public static final URL publishedAccounts = loadPublishedAccountsURL();
 	public static final URL publishedAccountsSchema = loadPublishedAccountsSchemaURL();
 	public static final URL legitimatedAccounts = loadLegitimatedAccountsURL();
 	public static final URL legitimatedAccountsSchema = loadLegitimatedAccountsSchemaURL();
+	public static final URL messageSchema = loadMessageSchemaURL();
 	
 	public static final String messageNamespace = "http://id.piratenpartei.de/message";
 	public static final String accountsNamespace = "http://id.piratenpartei.de/accounts";
 	public static final String legitimateNamespace = "http://id.piratenpartei.de/legitimate";
 	
-	public static final String legitimateChecksum = "wamy/5CAmjBgx1Qrslrk3XqGEzGjFel4AFmPgmvbVZiqGaqCXzPrbqsrPO4ce6SO23cNfBJMoNCHAJ8b+R1mfQ==";
+	public static final String legitimateChecksum = "8+2i9WyfduELKgVS99wgkCtdl5Asjjq7+4v2ghJsiou9Z7SPv83kCvNES+wOBRZAuFh2stAYLJct5Sw7PKEfpw==";
 	
 	public static final String HASH_ALGORITHM = "SHA-512";
 	public static final String MESSAGE_DIGEST_ALGORITHM = DigestMethod.SHA512;
@@ -28,6 +31,10 @@ public class Config {
 	public static final String CANONICALIZATION_METHOD = CanonicalizationMethod.INCLUSIVE;
 	public static final String KEY_TYPE = "DSA";
 
+	
+	static {
+		Init.init();
+	}
 	
 	private static URL loadPublishedAccountsURL() {
 		try {
@@ -39,7 +46,7 @@ public class Config {
 	
 	private static URL loadPublishedAccountsSchemaURL() {
 		try {
-			return new URL("file:test_files/registered.xsd");
+			return new URL("file:xsd/registered_local.xsd");
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
@@ -55,7 +62,15 @@ public class Config {
 
 	private static URL loadLegitimatedAccountsSchemaURL() {
 		try {
-			return new URL("file:test_files/legitimated.xsd");
+			return new URL("file:xsd/legitimated.xsd");
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static URL loadMessageSchemaURL() {
+		try {
+			return new URL("file:xsd/message_local.xsd");
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}

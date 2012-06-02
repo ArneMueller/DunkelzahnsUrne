@@ -68,6 +68,7 @@ public class PrivateAccount extends Account {
 			throw new KeyException("Konnte Schlüssel nicht schreiben");
 		}
 		m.sign(this);
+		m.send();
 		try {
 			m.verify();
 		} catch (VerificationException e) {
