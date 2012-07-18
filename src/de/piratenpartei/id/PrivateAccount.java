@@ -38,10 +38,20 @@ public class PrivateAccount extends Account {
 	 */
 	public void publish() throws KeyException, IOException {
 		Message m = new Message(this);
-		m.setMessage(Helper.computeHash(getPublicKey()));
+		StringBuilder builder = new StringBuilder();
+		builder.append("Publish Account\n");
+		builder.append("Hash: ");
+		builder.append(Helper.computeHash(getPublicKey()));
+		builder.append("\n");
+		Helper.writePublicKey(builder, getPublicKey());
+		m.setMessage(builder.toString());
+		
+		/*
 		URLConnection conn = Config.publishAccount.openConnection();
 		OutputStream out = conn.getOutputStream();
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(out, Config.CHARSET));
 		m.send(pw);
+		*/
+		m.send(System.out);
 	}
 }

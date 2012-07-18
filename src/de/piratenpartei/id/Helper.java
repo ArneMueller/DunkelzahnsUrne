@@ -36,7 +36,7 @@ public class Helper {
 		
 		KeyFactory fact;
 		try {
-			fact = KeyFactory.getInstance("RSA"); // TODO: specify security provider
+			fact = KeyFactory.getInstance("RSA", Config.getProvider()); // TODO: specify security provider
 		} catch (NoSuchAlgorithmException e) {
 			throw new RuntimeException("No security provider for RSA algorithm", e);
 		} 
@@ -51,6 +51,19 @@ public class Helper {
 		return pk;
 	}
 	
+	public static void writePublicKey(StringBuilder builder, PublicKey pk) throws KeyException {
+		if(!(pk instanceof RSAPublicKey)) throw new KeyException("Key is not a RSAPublicKey");
+		RSAPublicKey pub = (RSAPublicKey) pk;
+		builder.append("Modulus: ");
+		String modulus = Base64.encodeBase64String(pub.getModulus().toByteArray());
+		builder.append(modulus);
+		builder.append("\n");
+		builder.append("Exponent: ");
+		String exponent = Base64.encodeBase64String(pub.getPublicExponent().toByteArray());
+		builder.append(exponent);
+		builder.append("\n");
+	}
+	
 	public static String computeHash(PublicKey pk) throws KeyException {
 		if(!(pk instanceof RSAPublicKey)) throw new KeyException("Key is not a RSAPublicKey");
 		RSAPublicKey pub = (RSAPublicKey) pk;
@@ -58,7 +71,7 @@ public class Helper {
 		// setup MessageDigest algorithm to compute the hash
 		MessageDigest d;
 		try {
-			d = MessageDigest.getInstance(Config.HASH_ALGORITHM);
+			d = MessageDigest.getInstance(Config.HASH_ALGORITHM, Config.getProvider());
 		} catch (NoSuchAlgorithmException e) {
 			throw new RuntimeException(e);
 		}
@@ -72,7 +85,7 @@ public class Helper {
 	public static String computeDigest(String text) {
 		MessageDigest d;
 		try {
-			d = MessageDigest.getInstance(Config.HASH_ALGORITHM);
+			d = MessageDigest.getInstance(Config.HASH_ALGORITHM, Config.getProvider());
 		} catch (NoSuchAlgorithmException e) {
 			throw new RuntimeException(e);
 		}
@@ -91,7 +104,7 @@ public class Helper {
 		if(!(pk instanceof RSAPublicKey)) throw new KeyException("Key is not a RSAPublicKey");
 		byte[] val;
 		try {
-			Cipher c = Cipher.getInstance("RSA/None/NoPadding");
+			Cipher c = Cipher.getInstance(Config.SIGNATURE_ALGORITHM, Config.getProvider());
 			c.init(Cipher.ENCRYPT_MODE, pk);
 			val = c.doFinal(digest.getBytes(Config.CHARSET));
 		} catch (InvalidKeyException e) {

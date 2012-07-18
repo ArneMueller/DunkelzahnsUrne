@@ -30,7 +30,7 @@ public class TestVerify {
 
 	@Test
 	public void testCorrectKey() throws KeyException {
-		Account a = new Account("_RLVQKMQRBSAXVGJASV6EXO2BVRX4N7HIULYJPTJL7SUE4PYO7QHSGRUYNCRDXI55H2PA5SGE37RXCJMSDTZMAOGGNTXQYZR6BMQ2BVQ_");
+		Account a = new Account("i9YMFc+vWTpO3B5hxwsg80UvHX6sGUKdhyly7RQOfg230UZfaVfN6fqHMtfb3bxydpRUEuQvgKgW450FwzrSww==");
 		assertTrue(a.isPublished());
 		assertFalse(a.isVerified());
 	}
@@ -38,6 +38,6 @@ public class TestVerify {
 
 	@Test
 	public void testMessage() throws KeyException, IllegalFormatException, IOException, VerificationException {
-		new Message(new FileInputStream("test_files/message.xml"));
+		new Message(new FileInputStream("test_files/message"));
 	}
 }

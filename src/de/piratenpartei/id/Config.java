@@ -2,8 +2,9 @@ package de.piratenpartei.id;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.Provider;
 
-import org.apache.xml.security.Init;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class Config {
 
@@ -21,6 +22,7 @@ public class Config {
 	public static final String legitimateChecksum = "8+2i9WyfduELKgVS99wgkCtdl5Asjjq7+4v2ghJsiou9Z7SPv83kCvNES+wOBRZAuFh2stAYLJct5Sw7PKEfpw==";
 	
 	public static final String HASH_ALGORITHM = "SHA-512";
+	public static final String SIGNATURE_ALGORITHM = "RSA/None/NoPadding";
 	//public static final String MESSAGE_DIGEST_ALGORITHM = DigestMethod.SHA512;
 	//public static final String SIGNATURE_METHOD = SignatureMethod.DSA_SHA1;
 	//public static final String CANONICALIZATION_METHOD = CanonicalizationMethod.INCLUSIVE;
@@ -28,8 +30,10 @@ public class Config {
 	
 	public static final String CHARSET = "UTF8";
 	
-	static {
-		Init.init();
+	private static final Provider provider = new BouncyCastleProvider();
+	
+	public static Provider getProvider() {
+		return provider;
 	}
 	
 	private static URL loadPublishedAccountsURL() {

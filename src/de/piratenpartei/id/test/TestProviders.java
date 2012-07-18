@@ -5,6 +5,8 @@ import java.security.Security;
 
 import org.junit.Test;
 
+import de.piratenpartei.id.Config;
+
 public class TestProviders {
 
 	@Test
@@ -16,6 +18,11 @@ public class TestProviders {
 			System.out.println(p.getInfo());
 			System.out.println();
 		}
+		
+		System.out.println("Manually configured provider:");
+		System.out.println(Config.getProvider().getName());
+		System.out.println(Config.getProvider().getInfo());
+		System.out.println();
 	}
 
 }

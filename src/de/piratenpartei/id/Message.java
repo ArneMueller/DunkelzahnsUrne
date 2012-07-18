@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.PrintStream;
 
 public class Message {
 	
@@ -47,6 +47,11 @@ public class Message {
 		catch(IOException ex) {
 			throw new IOException("[Line "+line+"] Failed to read", ex);
 		}
+		/*
+		System.out.println("computing digest of:");
+		System.out.println(message);
+		System.out.println("EndMessage");
+		*/
 		String computed_digest = Helper.computeDigest(message);
 		if(!computed_digest.equals(digest)) throw new VerificationException("Digest does not match to message. Message may be manipulated!");
 		String computed_signature = Helper.computeSignature(digest, author.getPublicKey());
@@ -74,12 +79,16 @@ public class Message {
 		return author;
 	}
 	
-	public void send(PrintWriter pw) throws KeyException {
+	public void send(PrintStream ps) throws KeyException {
+		// make sure message ends with a new line
+		if(!message.endsWith("\n")) {
+			message = message + "\n";
+		}
 		String digest = Helper.computeDigest(message);
 		String signature = Helper.computeSignature(digest, author.getPublicKey());
-		pw.println("Author: "+Helper.computeHash(author.getPublicKey()));
-		pw.println("Digest: "+digest);
-		pw.println("Signature: "+signature);
-		pw.println(message);
+		ps.println("Author: "+Helper.computeHash(author.getPublicKey()));
+		ps.println("Digest: "+digest);
+		ps.println("Signature: "+signature);
+		ps.print(message); // message already contains newline
 	}
 }
