@@ -1,21 +1,14 @@
 package de.piratenpartei.id;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.URLConnection;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.crypto.MarshalException;
-import javax.xml.crypto.dom.DOMStructure;
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
-import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
-import javax.xml.crypto.dsig.keyinfo.KeyValue;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
 
 public class PrivateAccount extends Account {
 	
@@ -27,11 +20,11 @@ public class PrivateAccount extends Account {
 	public PrivateAccount() throws KeyException {
 		KeyPairGenerator kpg;
 		try {
-			kpg = KeyPairGenerator.getInstance("DSA");
+			kpg = KeyPairGenerator.getInstance("RSA");
 		} catch (NoSuchAlgorithmException e) {
 			throw new RuntimeException(e);
 		}
-		kpg.initialize(1024);
+		kpg.initialize(4096);
 		keys = kpg.generateKeyPair();
 		init(keys.getPublic());
 	}
@@ -40,40 +33,15 @@ public class PrivateAccount extends Account {
 		return keys.getPrivate();
 	}
 	
-	public KeyInfo getKeyInfo() throws KeyException {
-		KeyInfoFactory kif = KeyInfoFactory.getInstance();
-		KeyValue kv;
-		try {
-			kv = kif.newKeyValue(publicKey);
-		} catch (java.security.KeyException e) {
-			throw new KeyException("failed to write publicKey into XML", e);
-		}
-		List<KeyValue> content = new ArrayList<KeyValue>();
-		content.add(kv);
-		KeyInfo ki = kif.newKeyInfo(content);
-		
-		return ki;
-	}
-	
 	/**
 	 * publishes the public key, i.e. registers the Account.
 	 */
-	public void publish() throws KeyException {
-		Message m = new Message();
-		KeyInfo ki = getKeyInfo();
-		DOMStructure dom = new DOMStructure(m.getBody());
-		try {
-			ki.marshal(dom, null);
-		} catch (MarshalException e) {
-			throw new KeyException("Konnte Schlüssel nicht schreiben");
-		}
-		m.sign(this);
-		m.send();
-		try {
-			m.verify();
-		} catch (VerificationException e) {
-			throw new KeyException("Die Eigene Signatur wird nicht verifiziert!",e);
-		}
-		m.send();
+	public void publish() throws KeyException, IOException {
+		Message m = new Message(this);
+		m.setMessage(Helper.computeHash(getPublicKey()));
+		URLConnection conn = Config.publishAccount.openConnection();
+		OutputStream out = conn.getOutputStream();
+		PrintWriter pw = new PrintWriter(new OutputStreamWriter(out, Config.CHARSET));
+		m.send(pw);
 	}
 }

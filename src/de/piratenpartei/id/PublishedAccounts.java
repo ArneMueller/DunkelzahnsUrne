@@ -1,51 +1,69 @@
 package de.piratenpartei.id;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.List;
-
-import javax.xml.XMLConstants;
-import javax.xml.crypto.MarshalException;
-import javax.xml.crypto.dom.DOMStructure;
-import javax.xml.crypto.dsig.XMLSignature;
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
-import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
-import javax.xml.crypto.dsig.keyinfo.KeyValue;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.validation.SchemaFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import java.io.InputStreamReader;
+import java.security.PublicKey;
+import java.util.HashMap;
 
 public class PublishedAccounts {
-	private Document doc;
+	private HashMap<String, PublicKey> accounts;
 	
-	private static final PublishedAccounts INSTANCE = new PublishedAccounts();
+	private static final PublishedAccounts INSTANCE = createPublishedAccounts();
 	
-	private PublishedAccounts() {
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance(); 
-		dbf.setNamespaceAware(true); 
+	private static PublishedAccounts createPublishedAccounts() {
 		try {
-			dbf.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(Config.publishedAccountsSchema));
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
+			return new PublishedAccounts();
 		}
-		DocumentBuilder builder;
-		try {
-			builder = dbf.newDocumentBuilder();
-			builder.setErrorHandler(new ParseErrorHandler());
-			doc = builder.parse(Config.publishedAccounts.openStream());
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		} catch (SAXException e) {
-			throw new RuntimeException(e);
+		catch(IllegalFormatException ex) {
+			throw new RuntimeException(ex);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		}  
+		}
+	}
+	
+	/**
+	 * Loads list of published accounts from a file (possibly fetched from the internet).
+	 * The file has to have entries of the form: <br>
+	 * Hash: <hash of RSA key 1> <br>
+	 * Modulus: <modulus of the RSA key 1> <br>
+	 * Exponent: <public exponent of the RSA key 1> <br>
+	 * Hash: <hash of RSA key 2> <br>
+	 * Modulus: <modulus of the RSA key 2> <br>
+	 * Exponent: <public exponent of the RSA key 2> <br>
+	 * Extra lines are not allowed
+	 * @throws IllegalFormatException
+	 */
+	private PublishedAccounts() throws IllegalFormatException, IOException {
+		accounts = new HashMap<String,PublicKey>();
+		int line = 1;
+		try {
+			BufferedReader br = new BufferedReader(new InputStreamReader(Config.publishedAccounts.openStream(), Config.CHARSET));
+			String buffer;
+			while((buffer = br.readLine()) != null) {
+				try {
+					String hash = Helper.read("Hash", buffer);
+					line++;
+					buffer = br.readLine();
+					if(buffer == null) throw new IllegalFormatException("[Line "+line+"] Expected \"Modulus:\"");
+					String modulus = Helper.read("Modulus", buffer);
+					line++;
+					buffer = br.readLine();
+					if(buffer == null) throw new IllegalFormatException("[Line "+line+"] Expected \"Exponent:\"");
+					String exponent = Helper.read("Exponent", buffer);
+					PublicKey pk = Helper.readPublicKey(modulus,  exponent);
+					Helper.verifyKey(pk, hash);
+					accounts.put(hash, pk);
+					line++;
+				} catch (IllegalFormatException e) {
+					throw new IllegalFormatException("[Line "+line+"] "+e.getMessage(), e);
+				} catch (KeyException e) {
+					throw new IllegalFormatException("[Line "+line+"] "+e.getMessage(), e);
+				}
+			}
+		} catch (IOException e) {
+			throw new IOException("[Line "+line+"] Failed to read", e);
+		}
 	}
 	
 	public static PublishedAccounts getInstance() {
@@ -58,36 +76,10 @@ public class PublishedAccounts {
 	 * @return
 	 * @throws KeyException
 	 */
-	public KeyValue getKey(String hash) throws KeyException {
-		KeyInfoFactory factory = KeyInfoFactory.getInstance();
-		Element node = doc.getElementById(hash);
-		if(node == null) {
-			throw new KeyException("Es ist kein Schlüssel für"+hash+" eingetragen!");
-		}
-		NodeList nl = node.getElementsByTagNameNS(XMLSignature.XMLNS, "KeyInfo");
-		if(nl.getLength() != 1) {
-			throw new KeyException("Wrong Number of Keys contained for Account "+hash);
-		}
-		
-		DOMStructure xmlStructure = new DOMStructure(nl.item(0));
-		KeyInfo k;
-		try {
-			k = factory.unmarshalKeyInfo(xmlStructure);
-		} catch (MarshalException e) {
-			throw new KeyException("Der Eintrag für "+hash+" konnte nicht geladen werden!");
-		}
-		List<?> content = k.getContent();
-		if(content.size() == 0) {
-			throw new KeyException("Es ist kein Schlüssel für "+hash+" abgespeichert!");
-		}
-		if(content.size() > 1) {
-			throw new KeyException("Es ist mehr als ein Schlüssel für "+hash+" abgespeichert!");
-		}
-		if(! (content.get(0) instanceof KeyValue) ) {
-			throw new KeyException("Es ist zwar was für "+hash+" abgespeichert, dass ist aber kein Schlüssel!");
-		}
-		KeyValue kv = (KeyValue) content.get(0);
-		return kv;
+	public PublicKey getKey(String hash) throws KeyException {
+		PublicKey pk = accounts.get(hash);
+		if(pk == null) throw new KeyException("Key is not published: "+hash);
+		return pk;
 	}
 	
 	/**
@@ -96,33 +88,6 @@ public class PublishedAccounts {
 	 * @return
 	 */
 	public boolean hasKey(String hash) {
-		KeyInfoFactory factory = KeyInfoFactory.getInstance();
-		Element node = doc.getElementById(hash);
-		if(node == null) {
-			return false;
-		}
-		NodeList nl = node.getElementsByTagNameNS(XMLSignature.XMLNS, "KeyInfo");
-		if(nl.getLength() != 1) {
-			return false;
-		}
-		
-		DOMStructure xmlStructure = new DOMStructure(nl.item(0));
-		KeyInfo k;
-		try {
-			k = factory.unmarshalKeyInfo(xmlStructure);
-		} catch (MarshalException e) {
-			return false;
-		}
-		List<?> content = k.getContent();
-		if(content.size() == 0) {
-			return false;
-		}
-		if(content.size() > 1) {
-			return false;
-		}
-		if(! (content.get(0) instanceof KeyValue) ) {
-			return false;
-		}
-		return true;
+		return accounts.containsKey(hash);
 	}
 }

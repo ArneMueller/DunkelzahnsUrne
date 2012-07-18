@@ -1,7 +1,5 @@
 package de.piratenpartei.id.test;
 
-import static org.junit.Assert.*;
-
 import java.security.Provider;
 import java.security.Security;
 

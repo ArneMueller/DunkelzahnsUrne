@@ -1,6 +1,6 @@
 package de.piratenpartei.id.test;
 
-import static org.junit.Assert.*;
+import java.io.IOException;
 
 import org.junit.Test;
 
@@ -10,7 +10,7 @@ import de.piratenpartei.id.PrivateAccount;
 public class TestCreate {
 
 	@Test
-	public void test() throws KeyException {
+	public void test() throws KeyException, IOException {
 		PrivateAccount pa = new PrivateAccount();
 		pa.publish();
 	}
