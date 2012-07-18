@@ -6,6 +6,14 @@ import java.io.InputStreamReader;
 import java.security.PublicKey;
 import java.util.HashMap;
 
+/**
+ * This class manages the list of published accounts.
+ * 
+ * Currently this list is loaded statically. This should be changed in the future.
+ * 
+ * @author arne
+ *
+ */
 public class PublishedAccounts {
 	private HashMap<String, PublicKey> accounts;
 	

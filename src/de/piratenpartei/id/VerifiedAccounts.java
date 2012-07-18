@@ -12,6 +12,14 @@ import java.util.HashSet;
 
 import org.apache.commons.codec.binary.Base64;
 
+/**
+ * This class manages the verified accounts.
+ * 
+ * Currently this list is loaded statically. This should be changed in the future.
+ * 
+ * @author arne
+ *
+ */
 public class VerifiedAccounts {
 	private HashSet<String> accounts = new HashSet<String>();
 
@@ -73,6 +81,11 @@ public class VerifiedAccounts {
 		return INSTANCE;
 	}
 	
+	/**
+	 * Checks if the specified hash corresponds to a verified account.
+	 * @param hash to check
+	 * @return true, if contained in the list of verified accounts.
+	 */
 	public boolean hasEntry(String hash) {
 		return accounts.contains(hash);
 	}

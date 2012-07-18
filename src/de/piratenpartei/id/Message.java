@@ -7,16 +7,32 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
+/**
+ * A signed message that is used to communicate with any kind of service.
+ * Every Message is associated to an {@link Account}. The account supplies the key for verifying the message.
+ * 
+ * Messages that were created by a {@link PrivateAccount} can be send.
+ * The sending process adds a signature to the message text.
+ * 
+ * @author arne
+ *
+ */
 public class Message {
 	
+	/** The message text */
 	String message;
+	/** The author of the message */
 	Account author;
 	
 	/**
 	 * Loads a message from a given input stream.
-	 * @param in
-	 * @throws IOException
-	 * @throws KeyException
+	 * Use this for received messages.
+	 * 
+	 * @param in to load the message
+	 * @throws IOException if the stream could not be read properly.
+	 * @throws KeyException if something is fishy with the key.
+	 * @throws IllegalFormatException if the input data has the wrong format.
+	 * @throws VerificationException if the signature of the message could not be validated.
 	 */
 	public Message(InputStream in) throws IOException, IllegalFormatException, KeyException, VerificationException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(in, Config.CHARSET));
@@ -55,20 +71,29 @@ public class Message {
 		*/
 		String computed_digest = Helper.computeDigest(message);
 		if(!computed_digest.equals(digest)) throw new VerificationException("Digest does not match to message. Message may be manipulated!");
-		String computed_signature = Helper.computeSignature(digest, author.getPublicKey());
-		if(!computed_signature.equals(signature)) throw new VerificationException("Siganture does not match to message. Message may be manipulated!");			
+		boolean verified = Helper.verifySignature(digest, signature, author.getPublicKey());
+		if(!verified) throw new VerificationException("Siganture does not match to message. Message may be manipulated!");			
 	}
 	
+	/**
+	 * Fetches the message text.
+	 * @return the message text.
+	 */
 	public String getMessage() {
 		return message;
 	}
 	
+	/**
+	 * Sets the message text (without signature information etc.)
+	 * @param message the new message text.
+	 */
 	public void setMessage(String message) {
 		this.message = message;
 	}
 	
 	/**
-	 * creates a new empty message
+	 * Creates a new empty message.
+	 * If the author is a {@link PrivateAccount}, the message can be send.
 	 * @param author
 	 */
 	public Message(Account author) {
@@ -76,17 +101,30 @@ public class Message {
 		this.message = "";
 	}
 	
+	/**
+	 * Returns the author of the message.
+	 * @return the author
+	 */
 	public Account getAuthor() {
 		return author;
 	}
 	
+	/**
+	 * Sends the message. To be precise, writes the content of the message to a PrintWriter which is then responsible for sending the message to its destination.
+	 * Make sure that the PrintWriter is writing in UTF8!
+	 * 
+	 * @param ps the PrintWriter to write the message to.
+	 * @throws KeyException if the author has not a private key, i.e. if the author is not a {@link PrivateAccount}
+	 */
 	public void send(PrintWriter ps) throws KeyException {
+		if(!(author instanceof PrivateAccount)) throw new KeyException("You cannot sign other peoples messages!");
+		PrivateAccount privateauthor = (PrivateAccount) author;
 		// make sure message ends with a new line
 		if(!message.endsWith("\n")) {
 			message = message + "\n";
 		}
 		String digest = Helper.computeDigest(message);
-		String signature = Helper.computeSignature(digest, author.getPublicKey());
+		String signature = Helper.computeSignature(digest, privateauthor.getPrivateKey());
 		ps.print("Author: "+Helper.computeHash(author.getPublicKey())+"\n");
 		ps.print("Digest: "+digest+"\n");
 		ps.print("Signature: "+signature+"\n");

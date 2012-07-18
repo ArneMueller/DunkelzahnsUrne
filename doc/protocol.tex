@@ -152,8 +152,8 @@ Danach kann beliebiger Text $t$ folgen, der mit LF enden muss. $t$ wird auch der
 Eine Nachricht ist \emph{gültig} gegenüber einer Liste registrierter Accounts $R$, falls
 \begin{itemize}
  \item der Hash $h$ nach $R$ registriert ist.
- \item der Digest $d$ gleich der \Base-codierung des \SHA Hashes von $t$ ist,
- \item der Digest $d$, verschlüsselt mit dem Schlüssel, der in $R$ für den Hash $h$ gespeichert ist, gleich $s$ ist. Als Verschlüsselungs-Algorithmus muss \RSA ohne Padding verwendet werden.
+ \item der Digest $d$ gleich der \Base-codierung des \SHA Hashes von $t$ ist und
+ \item die Signatur $s$, entschlüsselt mit dem Schlüssel, der in $R$ für den Hash $h$ gespeichert ist, gleich $d$ ist. Als Verschlüsselungs-Algorithmus muss \RSA mit PKCS v1.5 Padding verwendet werden.
 \end{itemize}
 
 Eine Nachricht ist \emph{verifiziert} gegenüber einer Liste verifizierter Accounts $V$, falls der Hash $h$ nach $V$ verifiziert ist.
@@ -168,18 +168,18 @@ Eine Nachricht ist eine gültige Account-Erstellungs-Nachricht, falls
 \item $h$ mit dem Hash, der bei Author angegeben ist, übereinstimmt,
 \item die dritte und vierte Zeile des Nachrichtentextes die Codierung eines öffentlichen Schlüssels $p$ sind,
 \item $h$ der Hash von $p$ ist,
-\item der Digest $d$ gleich der \Base-codierung des \SHA Hashes des Nachrichtentextes ist,
-\item der Digest $d$, verschlüsselt mit $p$, gleich $s$ ist. Als Verschlüsselungs-Algorithmus muss \RSA ohne Padding verwendet werden.
+\item der Digest $d$ gleich der \Base-codierung des \SHA Hashes des Nachrichtentextes ist und
+\item die Signatur $s$, entschlüsselt mit $p$, gleich $d$ ist. Als Verschlüsselungs-Algorithmus muss \RSA mit PKCS v1.5 Padding verwendet werden.
 \end{itemize}
 
 \paragraph{Beispiel:}
 \begin{verbatim}
-Author: uEiJDKYXVlS71A+OfbHK6S7r0SmxnK/lN8sJhE2WJsUEX5+F+WPQckFUBT2mmalszwRxutKUiHIqCDc5a1GqjQ==
-Digest: 6tRqYJGqFPlk1W2V/fUsft1r7NSRqTz8rh6FNKmw96hvIFCU04/+DDIbdzdlasb4zOtFqjqInrKd+mGAQg//uQ==
-Signature: R08uBh/Dn4rZpdiJhvMqB8j3KuxqrF3YLf0ksuoMBFVxZ7KrD3glOyjJs57mZLHB10HWOmGwO8GNeUKU0cZB6HEtEnUKKw1OPNHh7ZJHNnwrvL8FGZNCObUuBxpPlLJ7vWjkNY++p52Z3ijjsliZtAQGvafLYBUTgQG717D6tIKFzpOixnsWkWc+ReCRRVNx/BlcM5XSOd9niKdFe+5UpVpcPe8yC+aUNSZQ1ePo9k7FIXmHzE3G7T2Jlc2Tt5Yw1+aWQYjBx1mVW0n41vRJcQpBPoOwUvL3XiCOm/21fOI5SfmQ1P2tIhUU3oaUotJOBtAr7Dq9qzt6U6Mx180RJYsa3yYVnOldh9UXjGlJJbV+AAGXcx7Kka5U7R8NzfJmCy3CsgYDP0mzGPu6rYDCWE5om1Rl5ytHz8sCA25jN1MhE38/5osvWWaCts3qm0UvNdpMS+fLRd2Sq995aQouWD8B6JBJ9Q1CCcr/hO8o7n9XvKoroKWXEBIxqmLzdX4/6/j8UnDaFu6G6mJpoaBNdrCSsAnysC67IIlX31ysGHP+uxqPnbtKH7dA94GCRZKzGuRTxDsPEg7ODhC1bkdVB0HxLusYZKCH3ubXXOImBspjXzAeD6DbLig3Q5zN/p4m6sVzn3PK9ID4YtJMeC0xrKs3ZfJ2hdMln8wJVAwGhtM=
+Author: hpO/rM/QjX07fGibrUbGtqr7+OcRFda5jaCn2xLpqdt4WmUYphmS/P4ON3GNofjh8fWpOKe+nxDD/zgDC3X6rQ==
+Digest: PXiH1qZOKEtCoV07j88e38USVok5ehtc7j6OvOy7oJGCGLibCzrvEE91V32cSQYvvSGBXU/f2Obxs4Zkcubk9g==
+Signature: CipK+znGV1Dg2S8srorhDTKLPX18EGYKaEAwvVBknUfgTlmgn69rd3vxy7xV+jJkp+8VRX9XW2PtAJBVNbF+LastUE9vadQeVXNyMhhFx0foRADa7FPGF6ZmUWA/FPGi3kX4LhxDum2wrxoo7CgV2MYVOH9nM2Lv+5l/68LLHY0UgkseEarzR+xjPrIfYkCfiKIXZNCg6ZqjT5v5RLjytvfl1IfiHa7ua0LXaa6OoD7jOZivM7s/UfSaZ9KhbjWu4eag7xwM5TX2/GxuuXM+v30notXFLG1BsSywgse1E2FG7TezZB3cc5eHtXYS3hkeiqmPrnoZitqD3XAwEVi1LxQFHZS3Lx2YLclnPB8FwIdvFnJOVmoJbJPN89U4J6Z1WksX9yxhi5isqkeU0/qejYp7BMdqMjY9ABoAB96T3I7EG91sPAT6QfBUjT0Wd/TSQNGx6HEjJKkCvZJAmzgr9Pjl4DNZj2flpmNJOHs07lePVOklIEnkOZ4RrpPEC0VzNbj5ME7ZCeDj0rzgR4OLYgzb5bDj8qjqOX5m9RMC23b9OVLPuzLoFz0fud/57C0wdePTgQkB8HuGm2yJ2XlQj1Tbmvp3S5p12a8qGkjB3mdcIR9zvQw5PD/0Xe+jm3gUpFZmIsnysnXBVXFcOve3+ssdvCsPzrAl0vOZrofv66U=
 Publish Account
-Hash: uEiJDKYXVlS71A+OfbHK6S7r0SmxnK/lN8sJhE2WJsUEX5+F+WPQckFUBT2mmalszwRxutKUiHIqCDc5a1GqjQ==
-Modulus: AIe9uKt9sgj1mwNtuZDUPad1q+iaMKpTC1lTWN9ytA/NfJIEe8/A+wYuMgVWkQDX4P1zFBekgixqqcr9TB6xK0Kdg7ivvZfu5UfYqkRXJ3ehe5gS0Ip0sfMTRSO2Rualy3OQXUr2NA7AbeO5aMtwsrZ5R0CSvgBGW4YNxJYiqjVGgJ1aAxIJvCyVLXMLwEAvkQoJhRf26K7FPdS22WnBzvcggv/QQgvDD817R/04AfTD3IBmouWXdse2SNuzpJqQPAmXd7jTrR2lMLMhWDVl2kbROO3i1oNhkels0IBjCk5WXLs8T/qK462fOrqdWU+1VHXRR+SX2VP2VO4rdbf4lNa4PyjOmx2LHv4oypv5lzUrMTkbJ+VSKjnzgopKO+qdmxTQ8qIImzXjdG+5TQOdbnuzcOw+CChu3qKfk/TPDLOeW5Asl1IOHvsnejpmZ6mtSxNETsgqGl/EWz+UNtnaIOI+9R7oTvP4tFih0RB4CKwyZHA3hjsVlN9p5FVuJTYoRouWe/seClnDiix92/OUe9nOvAHO8ogLgh2B8yThK0vSfsH77odDjnFG4DgKRF5QJMVXMebgtanH9Sn5m1Nl7NmOykk5Q0Ha8djjkNAH/6ii9QfvJYmEuWYU524VGEzKmP8qnwG5DNzk6w+nSxTbS4/6/Kb2FL8OQdQfc9HARZgT
+Hash: hpO/rM/QjX07fGibrUbGtqr7+OcRFda5jaCn2xLpqdt4WmUYphmS/P4ON3GNofjh8fWpOKe+nxDD/zgDC3X6rQ==
+Modulus: AINYDQjkC6KAQAst9hkBVpVaXIOYbBSic8QMzNqjzNjIgmTxoPfOtLLwiOL3FhB5lfCTVxulZ15PAxc1AClrPJMCSX9V7e8HKWnmE+SEvaQjMiudUbHuasRcaFknsJRIlyZXhLR6DW1uR7NK574gIuyawChXHJIrqAfSnfw5JxIc2VRwbwUNAwS4sOd/pm7lsEJwP9LVnVvlm1UDRvA1BBs++4KGimUn7w85xPkVqQHPBsjAoPaQEEvoN8W6CnVg0FhuTGRQurQQeKXYRfcQINNEj/W0AnqkzLAwNBwW5HaLHFoqJgiE97HRtl/M6y/6RfDcL7iU8ikkZPKhVwf7DWaAlmiZpYhsNGPdvPfuDQ6ZglOnFSQA+53NJE5y18Au4xx+FI7yTrZak8tBKC4ysNwxcL74YFSntU/UbJvw5qvgCV5bFLCBVNeBLye9qWmBJTaAjJ01H2ymTcM4T6ed5MQdeZINwpDFdcmZo1zjuZU+4wm/SHWDC1WgITmO2CFWY+vIZKOCNduDRpRPCoXdaPZLMoHe1JdilPqiFmfOG6kJBYq37eQ5BhraEHxz6NH7nUe/InSmxl3zIiTTe+Yht7V5f4mc2RvqGPSP1gdtDyEupcrNDR43j/FES0CheEPdl6vexFNTJT3MfjKbmML8d6Ql1ptuqiQkBS0fctt/SFad
 Exponent: AQAB
 
 \end{verbatim}

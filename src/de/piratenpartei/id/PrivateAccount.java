@@ -29,6 +29,12 @@ public class PrivateAccount extends Account {
 		init(keys.getPublic());
 	}
 	
+	/**
+	 * Gets the private key of this account.
+	 * Usually used to sign messages.
+	 * @see Message#send(PrintWriter)
+	 * @return the private key
+	 */
 	public PrivateKey getPrivateKey() {
 		return keys.getPrivate();
 	}
@@ -52,6 +58,8 @@ public class PrivateAccount extends Account {
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(out, Config.CHARSET));
 		m.send(pw);
 		*/
-		m.send(new PrintWriter(System.out)); // dirty hack for testing
+		PrintWriter pw = new PrintWriter(System.out);
+		m.send(pw); // dirty hack for testing
+		pw.flush();
 	}
 }

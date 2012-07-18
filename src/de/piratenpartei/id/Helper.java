@@ -6,7 +6,9 @@ import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
@@ -18,8 +20,26 @@ import javax.crypto.NoSuchPaddingException;
 
 import org.apache.commons.codec.binary.Base64;
 
+/**
+ * This class is the main work horse. It contains methods that compute hashes or transform keys to Strings etc.
+ * 
+ * All methods are static. Hence, this class needs not be instantiated.
+ * 
+ * @author arne
+ *
+ */
 public class Helper {
 
+	/**
+	 * Creates a public key from modulus and exponent given as strings in Base64 encoding.
+	 * For precise description on the format of the strings see the protocol documentation.
+	 * A RSA key is created.
+	 * 
+	 * @param modulus the modulus of the RSA key.
+	 * @param exponent the exponent of the RSA key.
+	 * @return the loaded public key
+	 * @throws IllegalFormatException if something is not in the format as expected
+	 */
 	public static PublicKey readPublicKey(String modulus, String exponent) throws IllegalFormatException {
 		RSAPublicKeySpec spec;
 		try {
@@ -51,6 +71,15 @@ public class Helper {
 		return pk;
 	}
 	
+	/**
+	 * Writes a public key with the specified string builder.
+	 * This is the inverse operation of {@link #readPublicKey(String, String)}.
+	 * It first writes a line "Modulus: &lt;modulus&gt;" and then writes a line "Exponent: &lt;exponent&gt;".
+	 * 
+	 * @param builder the builder to write the result into
+	 * @param pk the public key to write
+	 * @throws KeyException if the key is not a RSA-Key
+	 */
 	public static void writePublicKey(StringBuilder builder, PublicKey pk) throws KeyException {
 		if(!(pk instanceof RSAPublicKey)) throw new KeyException("Key is not a RSAPublicKey");
 		RSAPublicKey pub = (RSAPublicKey) pk;
@@ -64,6 +93,12 @@ public class Helper {
 		builder.append("\n");
 	}
 	
+	/**
+	 * Computes the Hash of the specified key.
+	 * @param pk the key for which to compute the hash.
+	 * @return the computed hash
+	 * @throws KeyException if the Key is not a RSA key
+	 */
 	public static String computeHash(PublicKey pk) throws KeyException {
 		if(!(pk instanceof RSAPublicKey)) throw new KeyException("Key is not a RSAPublicKey");
 		RSAPublicKey pub = (RSAPublicKey) pk;
@@ -82,6 +117,11 @@ public class Helper {
 		return encoded;
 	}
 	
+	/**
+	 * Hashes the specified text and returns the computed digest
+	 * @param text the text to hash
+	 * @return the computed hash (digest)
+	 */
 	public static String computeDigest(String text) {
 		MessageDigest d;
 		try {
@@ -99,9 +139,15 @@ public class Helper {
 		return encoded;
 	}
 	
-	
-	public static String computeSignature(String digest, PublicKey pk) throws KeyException {
-		if(!(pk instanceof RSAPublicKey)) throw new KeyException("Key is not a RSAPublicKey");
+	/**
+	 * Encrypts a given string with the specified private key.
+	 * @param digest the text to encrypt
+	 * @param pk the private key to use
+	 * @return the encoded string.
+	 * @throws KeyException
+	 */
+	public static String computeSignature(String digest, PrivateKey pk) throws KeyException {
+		if(!(pk instanceof RSAPrivateKey)) throw new KeyException("Key is not a RSAPrivateKey");
 		byte[] val;
 		try {
 			Cipher c = Cipher.getInstance(Config.SIGNATURE_ALGORITHM, Config.getProvider());
@@ -123,8 +169,46 @@ public class Helper {
 		String encoded = Base64.encodeBase64String(val);
 		return encoded;
 	}
-
 	
+	/**
+	 * Verifies a signature. Decodes <code>signature</code> using the specified public key and checks if the result equals <code>digest</code>.
+	 * 
+	 * @param digest the digest to verify against
+	 * @param signature the signature string to decode
+	 * @param pk the public key for decoding
+	 * @return true iff verified.
+	 * @throws KeyException if the given key is not a RSA-key
+	 */
+	public static boolean verifySignature(String digest, String signature, PublicKey pk) throws KeyException {
+		if(!(pk instanceof RSAPublicKey)) throw new KeyException("Key is not a RSAPublicKey");
+		byte[] val;
+		try {
+			Cipher c = Cipher.getInstance(Config.SIGNATURE_ALGORITHM, Config.getProvider());
+			c.init(Cipher.DECRYPT_MODE, pk);
+			byte[] decoded = Base64.decodeBase64(signature);
+			val = c.doFinal(decoded);
+			return digest.equals(new String(val, Config.CHARSET));
+		} catch (InvalidKeyException e) {
+			throw new KeyException("Key is not a valid Key", e);
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		} catch (NoSuchPaddingException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalBlockSizeException e) {
+			throw new RuntimeException(e);
+		} catch (BadPaddingException e) {
+			throw new RuntimeException(e);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Checks, if the given hash is really the hash of the specified key.
+	 * @param pk the key to verify
+	 * @param hash the hash to verify
+	 * @throws KeyException if the hash doesn't match to the key.
+	 */
 	public static void verifyKey(PublicKey pk, String hash) throws KeyException {
 		String encoded = computeHash(pk);
 		if(!encoded.equals(hash)) throw new KeyException("Key does not match to hash: "+hash); 

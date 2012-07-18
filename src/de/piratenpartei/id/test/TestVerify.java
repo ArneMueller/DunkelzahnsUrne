@@ -20,7 +20,7 @@ public class TestVerify {
 	@Test
 	public void testWrongKey() {
 		try {
-			new Account("_5KATXMLH6DJWJCENL57PK4GWAPP5R3JUXAGF64ECO5N6GZ6R25XK7BZKFPNE55CZ6RDRBXK2K34XK7S4OBX42KFGNXNYTAF6CGMAPOI_");
+			new Account("ic_ZTBgESfPpRL6EnoOVEJNN5a4PvFNotQiIJAbZf7PxG8eseIn5nwshybMmT6W9ykIWzxQaOml7L2Q4VkwXPA==");
 			fail("must not succed, since key does not fit to hash!");
 		}
 		catch(KeyException ex) {

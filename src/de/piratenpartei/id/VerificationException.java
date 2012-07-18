@@ -1,5 +1,10 @@
 package de.piratenpartei.id;
 
+/**
+ * This exception is thrown, if a message failed to verify.
+ * @author arne
+ *
+ */
 public class VerificationException extends Exception {
 	
 	private static final long serialVersionUID = 1L;
