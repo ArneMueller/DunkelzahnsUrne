@@ -40,27 +40,6 @@
 \newcommand{\wiki}[2]{\href{http://wiki.piratenpartei.de/#1}{#2}}
 \newcommand{\mytitle}{ Die Akkreditierungsurne }
 
-\newcommand{\im}{\mathrm{im}\;}
-\newcommand{\vol}{\text{vol}}
-\newcommand{\conv}{\text{conv}}
-\newcommand{\lin}{\text{lin}}
-\newcommand{\cone}{\text{cone}}
-\newcommand{\aff}{\text{aff}}
-\newcommand{\rec}{\text{rec}}
-\newcommand{\lineal}{\text{lineal}}
-\newcommand{\eps}{\varepsilon}
-\newcommand{\face}{\text{face}}
-\newcommand{\row}{\text{row}}
-\newcommand{\col}{\text{col}}
-\newcommand{\sign}{\text{sign}}
-\newcommand{\proj}{\mathrm{proj}}
-\newcommand{\dom}{\mathrm{dom}\;}
-
-\newcommand{\mat}[2]{\left( \begin{array}{#1}#2\end{array} \right)}
-
-\lstset{language=XML}
-\lstset{frame=single, breaklines}
-
 
 %opening
 \title{\mytitle}
@@ -70,11 +49,11 @@
 \chead{\mytitle}
 \rhead{\today}
 
-%\theoremstyle{nonumberplain}
-% \newtheorem{claim}{Claim}[section]
-% \newtheorem{observation}{Observation}[section]
-% \newtheorem{problem}{Problem}[section]
-% \newtheorem{conjecture}{Conjecture}[section]
+\newcommand{\Base}{\texttt{Base64}}
+\newcommand{\Byte}{\texttt{Binär}}
+\newcommand{\RSA}{\href{https://tools.ietf.org/html/rfc3447}{RSA }}
+\newcommand{\SHA}{\href{http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf}{SHA-512 }}
+
 
 \begin{document}
 
@@ -101,88 +80,115 @@ Dabei werden folgende Schlüsselworte (in Großbuchstaben) genutzt:
 
 
 \section{Datentypen} \label{sec:datentypen}
-\subsection{Base32Encoding eines Byte-Array}
-Gegeben ein Byte-Array $b$. Sei $s$ das Base32 encoding von $b$ gemäß \href{https://www.ietf.org/rfc/rfc4648.txt}{www.ietf.org/rfc/rfc4648.txt}. Sei $w$ der String, den man erhält, wenn man bei $s$ jedes '=' durch '\_' ersetzt. 
-Dann ist $\_w$ definiert als das Base32Encoding von $b$.
+Zur Kommunikation werden nur Text-Nachrichten verwendet. Alle Text-Nachrichten sind in \href{https://tools.ietf.org/html/rfc3629}{UTF-8} codiert. Zeilenumbrüche sind Linux-codiert, d.h. nur mit LF. Implementierungen dürfen aber auch Windows-Zeilenumbrüche tolerieren, solange sie diese im Nachrichtentext zu Linux-Zeilenumbrüche umcodieren.
 
-TODO: Change Implementation
-
-\paragraph{Begründung}
-Die Hashes der öffentlichen Schlüssel werden als Identifikationsmerkmal des Autors genutzt. Dieses Identifikationsmerkmal wird in ID-Attributen benutzt und muss daher ein \href{http://www.w3.org/TR/xml11/#NT-Name}{bestimmtes Format} haben.
-
-Mit diesem Encoding hat ein 512bit String eine Länge von 105 Zeichen, kann also getwittert werden.
-
-\subsection{Liste verifizierter Accounts}
-Jede Liste verifizierter Accounts validiert gegen folgendes XML-Schema:
-\lstinputlisting{../xsd/legitimated.xsd}
-
-Jeder Hash, dessen Base32Encoding als id-Attribut eines Account-Elements in einer Liste verifizierter Accounts $L$  eingetragen ist, gilt als \emph{verifiziert nach $L$}.
-
-\subsection{Öffentlicher Schlüssel} \label{sec:publicKey}
-Ein Öffentlicher Schlüssel im Sinne dieser Spezifikation ist ein \texttt{KeyInfo} Element gemäß \url{http://www.w3.org/TR/xmldsig-core/#sec-KeyInfo}, welches genau ein \texttt{KeyValue} Element enthält und sonst keine weiteren Elemente. Das \texttt{KeyValue} Element muss einen DSA-Schlüssel (gemäß \url{http://www.w3.org/2000/09/xmldsig#DSAKeyValue}) codieren.
-
-\subsubsection{Hash eines öffentlichen Schlüssels}
-Sei $s$ die exclusive canonicalization (gemäß \url{http://www.w3.org/TR/2002/REC-xml-exc-c14n-20020718/}) ohne InclusiveNamespaces des \texttt{KeyValue} Elements.
-
-Der Hash des öffentlichen Schlüssels ist das Base32Encoding des SHA-512-Hashes (gemäß \url{http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf}) von $s$.
-
-TODO: Change implementation
-
-\subsection{Liste registrierter Accounts}
-Jede Liste registrierter Accounts validiert gegen folgendes XML-Schema:
-\lstinputlisting{../xsd/registered.xsd}
-
-Jeder Hash, dessen Base32Encoding als id-Attribut eines gültigen Account-Elements in einer Liste registrierter Accounts $L$  eingetragen ist, gilt als \emph{registriert nach $L$}. 
-Ein Account-Element ist gültig, falls
+\subsection{Abkürzungen}
 \begin{itemize}
- \item das enthaltene \texttt{sig:KeyInfo} Element ein öffentlicher Schlüssel gemäß Abschnitt \ref{sec:publicKey} ist.
- \item der Hash des öffentlichen Schlüssels mit dem Wert des id-Attributs übereinstimmt.
+ \item \Base-Codierung von Binärdaten. Binärdaten werden durch Strings gemäß \href{http://www.ietf.org/rfc/rfc2045.txt}{RFC 2045}, Section 6.8. Base64 Content-Transfer-Encoding codiert. Die Codestrings enthalten keine Zeilenumbrüche.
+ \item \Byte-Codierung von Zahlen. Die Binärdarstellung einer Zahl ist die 2-Komplement Darstellung in Big-Endian Bytereihenfolge. 
+ \item \Base-Codierung von Zahlen. Die \Base-Codierung einer Zahl ist die \Base-Codierung der \Byte-Codierung der Zahl. 
 \end{itemize}
 
+\subsection{Liste verifizierter Accounts}
+Jede Zeile der Liste verifizierter Accounts beginnt mit ``Account: '' und dann folgt ein \Base-codierten Hash.
+
+Jeder Hash, der so in einer Liste verifizierter Accounts $L$  eingetragen ist, gilt als \emph{verifiziert nach $L$}.
+
+\paragraph{Beispiel:}
+\begin{verbatim}
+Account: ic/ZTBgESfPpRL6EnoOVEJNN5a4PvFNotQiIJAbZf7PxG8eseIn5nwshybMmT6W9ykIWzxQaOml7L2Q4VkwXPA==
+Account: uEiJDKYXVlS71A+OfbHK6S7r0SmxnK/lN8sJhE2WJsUEX5+F+WPQckFUBT2mmalszwRxutKUiHIqCDc5a1GqjQ==
+\end{verbatim}
+
+
+\subsection{Öffentlicher Schlüssel} \label{sec:publicKey}
+Ein Öffentlicher Schlüssel im Sinne dieser Spezifikation ist ein öffentlicher RSA Schlüssel gemäß \href{https://tools.ietf.org/html/rfc3447}{PKCS \#1}. 
+Demnach besteht ein öffentlicher Schlüssel aus zwei Zahlen: einem Modulus und einem öffentlichen Exponenten.
+
+Die Codierung besteht aus zwei Zeilen.
+Die erste Zeile beginnt mit ``Modulus: '' und dann folgt der \Base-codierte Modulus des Schlüssels.
+Die zweite Zeile beginnt mit ``Exponent: '' und dann folgt der \Base-codierte Exponent des öffentlichen Exponenten.
+
+\paragraph{Besipiel:}
+\begin{verbatim}
+Modulus: AIe9uKt9sgj1mwNtuZDUPad1q+iaMKpTC1lTWN9ytA/NfJIEe8/A+wYuMgVWkQDX4P1zFBekgixqqcr9TB6xK0Kdg7ivvZfu5UfYqkRXJ3ehe5gS0Ip0sfMTRSO2Rualy3OQXUr2NA7AbeO5aMtwsrZ5R0CSvgBGW4YNxJYiqjVGgJ1aAxIJvCyVLXMLwEAvkQoJhRf26K7FPdS22WnBzvcggv/QQgvDD817R/04AfTD3IBmouWXdse2SNuzpJqQPAmXd7jTrR2lMLMhWDVl2kbROO3i1oNhkels0IBjCk5WXLs8T/qK462fOrqdWU+1VHXRR+SX2VP2VO4rdbf4lNa4PyjOmx2LHv4oypv5lzUrMTkbJ+VSKjnzgopKO+qdmxTQ8qIImzXjdG+5TQOdbnuzcOw+CChu3qKfk/TPDLOeW5Asl1IOHvsnejpmZ6mtSxNETsgqGl/EWz+UNtnaIOI+9R7oTvP4tFih0RB4CKwyZHA3hjsVlN9p5FVuJTYoRouWe/seClnDiix92/OUe9nOvAHO8ogLgh2B8yThK0vSfsH77odDjnFG4DgKRF5QJMVXMebgtanH9Sn5m1Nl7NmOykk5Q0Ha8djjkNAH/6ii9QfvJYmEuWYU524VGEzKmP8qnwG5DNzk6w+nSxTbS4/6/Kb2FL8OQdQfc9HARZgT
+Exponent: AQAB
+\end{verbatim}
+
+
+\subsubsection{Hash eines öffentlichen Schlüssels}
+Sei $m$ die \Byte-Codierung des Modulus und sei $e$ die \Byte-Codierung des öffentlichen Exponenten des öffentlichen Schlüssels.
+Der Hash des öffentlichen Schlüssels ist die \Base-Codierung des \SHA Hashes der Bytefolge $me$.
+
+\subsection{Liste registrierter Accounts}
+Jeder Eintrag der Liste registrierter Accounts besteht aus $3$ zusammenhängenden Zeilen. In der Liste registrierter Accounts sind nur solche Einträge enthalten.
+
+Die erste Zeile jedes Eintrages beginnt mit ``Hash: ''gefolgt von einem \Base-codierten Hash.
+Die zweite und dritte Zeile jedes Eintrages enthalten die Codierung eines öffentlichen Schlüssels.
+
+Jeder Hash eines gültigen Eintrages in einer Liste registrierter Accounts $L$ gilt als \emph{registriert nach $L$}. 
+Ein Eintrag mit Hash $h$ und öffentlichen Schlüssel $p$ ist gültig, falls der Hash von $p$ gleich $h$ ist.
+
+\paragraph{Beispiel}
+\begin{verbatim}
+Hash: ic/ZTBgESfPpRL6EnoOVEJNN5a4PvFNotQiIJAbZf7PxG8eseIn5nwshybMmT6W9ykIWzxQaOml7L2Q4VkwXPA==
+Modulus: AIR3IwoK65srUqdRJjDqJHaFPodRoNdYUMc+H3RfckyYLxs/YsLCcBXi8fh1h6kMLJR2+mWSo0GRAmfgh8iTCEUKDxq4VOH2ofU4P0MzY1+P1HtijdzssgfDgkkPp/fXlTReQyAC1Lzmscq2/lsDwADR7Erhxy2Ogy3NawvJOS4+uLwQXzTBcl94aJRk20zs6kyY15InVwCLDONIg/ywHXjC3F3gwhn2yzX/KoA2Lz785gznazv+f1vC4JnGSAyprykcTIuoVCkd7LR6Na45mJ8QRnKn0b+ZvphntWNOYKzk+AeZZX0Q5HgkzhtGbQcHO6TMoB8DqXW049aWOVM+jbx7hh8gF2lqLw42v94ESiU5pYRywlbX7oFtpMCPIneTnwG7HFhITA20HPnFi+5LClbNUq/abTFoaXG8eaFlv8bfaNLI0JPQkz25vpJ6geYHLy0O/tCxqGt3/9Sd3m8cz5VDf8RfwDJ9QQIG2Do0Ty40MnlCYHMP4kUfF1Gtq4S9vqgcPy8xYHaz9NqnjElkEPEhXiLip5Krbw9isebYUaKItayQ46hm6kFv7wBNZuST0etEwis0O2zy+eXsmzGo8DrD6PWe7FK1dZcV4d1kpCfMiuBnU8b4SBh8Q/bP4efI9XpMkea/T5wxTi8Rx0p8pclNSA2qudJVp3F5E4Prya75
+Exponent: AQAB
+Hash: i9YMFc+vWTpO3B5hxwsg80UvHX6sGUKdhyly7RQOfg230UZfaVfN6fqHMtfb3bxydpRUEuQvgKgW450FwzrSww==
+Modulus: AM0Q3ZDAluR2N6K0j4FRu7mhAkgmX6yjxJQmORpYk9b8EcVtE2PHdYjy4Yd4LW+MLfmfNX55iU6+XRV91kHN9Z1G6P+G9Ob72EkMJ9PqKwT/vnQNJW8WSrfp1dpKpw7jACdvV0UE6lsvOXm+efvlc5jHh85BprAA/TU9hV/yTb/Aq819eatJHW6F2Wa9XibNzb0rNPExdpzRVlskKEF7U0IH52pnBDcu6UseYzYZW43GWC47nGdftelG/QhRv6YLk9DKQ6eujmOIsXsrN18xARxeomxIqjarUq+gfAJYSIwa5WUirk9hvrXD8OanQXn5iRdF+283hzUmFD5NyR5xL/DjDggb+5c9nuLkiLKSLuKkifdldj0G/G4QNg/56h3bmetYJRPKTKlgmy8EHfTvVWCRJ/LmcHeXIl1ZeOAhj9Phduh3tmq4J5r6qIM5uH6aq8JEaLqYxyXyGd5+sPVb5Ro1dE6R60OcCiso8WSmun4P9+QUxsFG+6iCYIWeQh2J15H1d+YcBn4wizO/mnFINBL7A6VfTssBj8ObmsJ/Mt5xHutseRt6eSe4o6HCvMtRRNdf/tmZ+aLehlFFwemahScW6XFwtOlifCP4XI2vSYbzE3SscdJuD/41t8dZjDdoimlRCU25ojAiP95afT9DsENQoU2hlOn12q3DvH680xfP
+Exponent: AQAB
+Hash: uEiJDKYXVlS71A+OfbHK6S7r0SmxnK/lN8sJhE2WJsUEX5+F+WPQckFUBT2mmalszwRxutKUiHIqCDc5a1GqjQ==
+Modulus: AIe9uKt9sgj1mwNtuZDUPad1q+iaMKpTC1lTWN9ytA/NfJIEe8/A+wYuMgVWkQDX4P1zFBekgixqqcr9TB6xK0Kdg7ivvZfu5UfYqkRXJ3ehe5gS0Ip0sfMTRSO2Rualy3OQXUr2NA7AbeO5aMtwsrZ5R0CSvgBGW4YNxJYiqjVGgJ1aAxIJvCyVLXMLwEAvkQoJhRf26K7FPdS22WnBzvcggv/QQgvDD817R/04AfTD3IBmouWXdse2SNuzpJqQPAmXd7jTrR2lMLMhWDVl2kbROO3i1oNhkels0IBjCk5WXLs8T/qK462fOrqdWU+1VHXRR+SX2VP2VO4rdbf4lNa4PyjOmx2LHv4oypv5lzUrMTkbJ+VSKjnzgopKO+qdmxTQ8qIImzXjdG+5TQOdbnuzcOw+CChu3qKfk/TPDLOeW5Asl1IOHvsnejpmZ6mtSxNETsgqGl/EWz+UNtnaIOI+9R7oTvP4tFih0RB4CKwyZHA3hjsVlN9p5FVuJTYoRouWe/seClnDiix92/OUe9nOvAHO8ogLgh2B8yThK0vSfsH77odDjnFG4DgKRF5QJMVXMebgtanH9Sn5m1Nl7NmOykk5Q0Ha8djjkNAH/6ii9QfvJYmEuWYU524VGEzKmP8qnwG5DNzk6w+nSxTbS4/6/Kb2FL8OQdQfc9HARZgT
+Exponent: AQAB
+\end{verbatim}
+
+
 \subsection{Nachricht}
-Jede Nachricht validiert gegen folgendes XML-Schmea:
-\lstinputlisting{../xsd/message.xsd}
+Die erste Zeile jeder Nachricht ist ``Author: '' gefolgt von einem \Base-codierten Hash $h$. \\
+Die zweite Zeile jeder Nachricht ist ``Digest: '' gefolgt von einem \Base-codierten Digest $d$. \\
+Die dritte Zeile jeder Nachricht ist ``Signature: '' gefolgt von einer \Base-codierten Signatur $s$. \\
+Danach kann beliebiger Text $t$ folgen, der mit LF enden muss. $t$ wird auch der Text der Nachricht genannt.
 
 Eine Nachricht ist \emph{gültig} gegenüber einer Liste registrierter Accounts $R$, falls
 \begin{itemize}
- \item der Hash \texttt{/Message/Body@author} nach $R$ registriert ist.
- \item Die Signatur (\texttt{/Message/Signature}) gegen den öffentlichen Schlüssel, der in $R$ für den Hash \texttt{/Message/Body@author} gespeichert ist, verifiziert.
- \item Die Signatur (\texttt{/Message/Signature}) genau eine Referenz enthält, wobei
- \begin{itemize}
-  \item die URI der Referenz genau \texttt{"\#body"} ist.
-  \item die Referenz keine expliziten Transformationen benennt
-  \item \href{http://www.w3.org/2001/04/xmlenc#sha512}{SHA-512} als DigestMethod benutzt.
- \end{itemize}
+ \item der Hash $h$ nach $R$ registriert ist.
+ \item der Digest $d$ gleich der \Base-codierung des \SHA Hashes von $t$ ist,
+ \item der Digest $d$, verschlüsselt mit dem Schlüssel, der in $R$ für den Hash $h$ gespeichert ist, gleich $s$ ist. Als Verschlüsselungs-Algorithmus muss \RSA ohne Padding verwendet werden.
 \end{itemize}
 
-Eine Nachricht ist \emph{verifiziert} gegenüber einer Liste verifizierter Accounts $V$, falls der Hash \texttt{/Message/Body@author} nach $V$ verifiziert ist.
+Eine Nachricht ist \emph{verifiziert} gegenüber einer Liste verifizierter Accounts $V$, falls der Hash $h$ nach $V$ verifiziert ist.
 
-TODO:change implementation
+\paragraph{Beispiel:} siehe Account-Erstellungs-Nachricht.
 
 \subsection{Account-Erstellungs-Nachricht}
-Eine Nachricht ist eine Account-Erstellungs-Nachricht, falls \texttt{/Message/Body} genau ein Element enthält, welches ein öffentlicher Schlüssel (nach Abschnitt \label{sec:publickKey}) ist. 
-Die Account-Erstellungs-Nachricht ist gültig, 
+Eine Nachricht ist eine gültige Account-Erstellungs-Nachricht, falls 
 \begin{itemize}
- \item falls \texttt{/Message/Body@author} mit dem Hash des öffentlichen Schlüssels übereinstimmt.
- \item Die Signatur (\texttt{/Message/Signature}) gegen den im Body gespeicherten öffentlichen Schlüssel verifiziert.
- \item Die Signatur (\texttt{/Message/Signature}) genau eine Referenz enthält, wobei
- \begin{itemize}
-  \item die URI der Referenz genau \texttt{"\#body"} ist.
-  \item die Referenz keine expliziten Transformationen benennt
-  \item \href{http://www.w3.org/2001/04/xmlenc#sha512}{SHA-512} als DigestMethod benutzt.
- \end{itemize}
+\item die erste Zeile des Nachrichtentextes ``Publish Account'' ist,
+\item die zweite Zeile des Nachrichtentextes muss mit ``Hash: ''beginnen, gefolgt von einem \Base-codierten Hash $h$,
+\item $h$ mit dem Hash, der bei Author angegeben ist, übereinstimmt,
+\item die dritte und vierte Zeile des Nachrichtentextes die Codierung eines öffentlichen Schlüssels $p$ sind,
+\item $h$ der Hash von $p$ ist,
+\item der Digest $d$ gleich der \Base-codierung des \SHA Hashes des Nachrichtentextes ist,
+\item der Digest $d$, verschlüsselt mit $p$, gleich $s$ ist. Als Verschlüsselungs-Algorithmus muss \RSA ohne Padding verwendet werden.
 \end{itemize}
 
-\subsubsection{Hash der Nachricht}
-Der Hash der Nachricht ist der Wert des Attributs \texttt{/Message/Body@author}.
+\paragraph{Beispiel:}
+\begin{verbatim}
+Author: uEiJDKYXVlS71A+OfbHK6S7r0SmxnK/lN8sJhE2WJsUEX5+F+WPQckFUBT2mmalszwRxutKUiHIqCDc5a1GqjQ==
+Digest: 6tRqYJGqFPlk1W2V/fUsft1r7NSRqTz8rh6FNKmw96hvIFCU04/+DDIbdzdlasb4zOtFqjqInrKd+mGAQg//uQ==
+Signature: R08uBh/Dn4rZpdiJhvMqB8j3KuxqrF3YLf0ksuoMBFVxZ7KrD3glOyjJs57mZLHB10HWOmGwO8GNeUKU0cZB6HEtEnUKKw1OPNHh7ZJHNnwrvL8FGZNCObUuBxpPlLJ7vWjkNY++p52Z3ijjsliZtAQGvafLYBUTgQG717D6tIKFzpOixnsWkWc+ReCRRVNx/BlcM5XSOd9niKdFe+5UpVpcPe8yC+aUNSZQ1ePo9k7FIXmHzE3G7T2Jlc2Tt5Yw1+aWQYjBx1mVW0n41vRJcQpBPoOwUvL3XiCOm/21fOI5SfmQ1P2tIhUU3oaUotJOBtAr7Dq9qzt6U6Mx180RJYsa3yYVnOldh9UXjGlJJbV+AAGXcx7Kka5U7R8NzfJmCy3CsgYDP0mzGPu6rYDCWE5om1Rl5ytHz8sCA25jN1MhE38/5osvWWaCts3qm0UvNdpMS+fLRd2Sq995aQouWD8B6JBJ9Q1CCcr/hO8o7n9XvKoroKWXEBIxqmLzdX4/6/j8UnDaFu6G6mJpoaBNdrCSsAnysC67IIlX31ysGHP+uxqPnbtKH7dA94GCRZKzGuRTxDsPEg7ODhC1bkdVB0HxLusYZKCH3ubXXOImBspjXzAeD6DbLig3Q5zN/p4m6sVzn3PK9ID4YtJMeC0xrKs3ZfJ2hdMln8wJVAwGhtM=
+Publish Account
+Hash: uEiJDKYXVlS71A+OfbHK6S7r0SmxnK/lN8sJhE2WJsUEX5+F+WPQckFUBT2mmalszwRxutKUiHIqCDc5a1GqjQ==
+Modulus: AIe9uKt9sgj1mwNtuZDUPad1q+iaMKpTC1lTWN9ytA/NfJIEe8/A+wYuMgVWkQDX4P1zFBekgixqqcr9TB6xK0Kdg7ivvZfu5UfYqkRXJ3ehe5gS0Ip0sfMTRSO2Rualy3OQXUr2NA7AbeO5aMtwsrZ5R0CSvgBGW4YNxJYiqjVGgJ1aAxIJvCyVLXMLwEAvkQoJhRf26K7FPdS22WnBzvcggv/QQgvDD817R/04AfTD3IBmouWXdse2SNuzpJqQPAmXd7jTrR2lMLMhWDVl2kbROO3i1oNhkels0IBjCk5WXLs8T/qK462fOrqdWU+1VHXRR+SX2VP2VO4rdbf4lNa4PyjOmx2LHv4oypv5lzUrMTkbJ+VSKjnzgopKO+qdmxTQ8qIImzXjdG+5TQOdbnuzcOw+CChu3qKfk/TPDLOeW5Asl1IOHvsnejpmZ6mtSxNETsgqGl/EWz+UNtnaIOI+9R7oTvP4tFih0RB4CKwyZHA3hjsVlN9p5FVuJTYoRouWe/seClnDiix92/OUe9nOvAHO8ogLgh2B8yThK0vSfsH77odDjnFG4DgKRF5QJMVXMebgtanH9Sn5m1Nl7NmOykk5Q0Ha8djjkNAH/6ii9QfvJYmEuWYU524VGEzKmP8qnwG5DNzk6w+nSxTbS4/6/Kb2FL8OQdQfc9HARZgT
+Exponent: AQAB
 
-\subsubsection{Schlüssel der Nachricht}
-Der Schlüssel der Nachricht ist das Element \texttt{/Message/Body/KeyInfo}.
+\end{verbatim}
+
 
 \subsection{Akkreditierungsbrief}
 Der Akkreditierungsbrief ist ein auf Papier gedruckter Hash des öffentlichen Schlüssels. Konkret ist enthalten:
 \begin{itemize}
- \item Der Hash als Text in Base32Encoding
+ \item Der \Base-codierte Hash
  \item Der Hash als QR-CODE (TODO:genauer)
 \end{itemize}
 
@@ -213,8 +219,8 @@ Der Account-Server verwaltet die offizielle Liste der registrierten Accounts, we
 
 \subsubsection{Empfang einer Nachricht $m$ }
 \begin{itemize}
- \item Der Account-Server MUSS prüfen, ob $m$ eine gültig Account-Erstellungs-Nachricht ist.
- \item Ist $m$ eine gültige Account-Erstellungs-Nachricht, so MUSS der Account-Server in der offizielle Liste der registrierten Accounts einen Eintrag unter dem Hash von $m$ mit dem Schlüssel von $m$ erstellen. Falls schon ein Eintrag mit dem Hash von $m$ existiert, so MUSS der existierende Eintrag überschrieben werden.
+ \item Der Account-Server MUSS prüfen, ob $m$ eine gültige Account-Erstellungs-Nachricht ist.
+ \item Ist $m$ eine gültige Account-Erstellungs-Nachricht, so MUSS der Account-Server in der offiziellen Liste der registrierten Accounts einen Eintrag unter dem Hash von $m$ mit dem Schlüssel von $m$ erstellen. Falls schon ein Eintrag mit dem Hash von $m$ existiert, so MUSS der existierende Eintrag überschrieben werden.
  \item Ist $m$ keine gültige Account-Erstellungs-Nachricht, so DARF die offizielle Liste der registrierten Accounts NICHT modifiziert werden.
 \end{itemize}
 
@@ -253,7 +259,7 @@ Dies macht der Client um die Nachrichten (z.B. Stimmabgaben anderer Nutzer auf i
 \begin{itemize}
  \item Der Client SOLL sich den Hash der offiziellen Liste der verifizierten Accounts besorgen (z.B. als Wahlbeobachter bei der Auszählung der Stimmzettel, oder über ein WebOfTrust)
  \item Der Client SOLL die offizielle Liste der verifizierten Accounts herunterladen und mit dem Hash auf Modifikationen überprüfen.
- \item Der Client SOLL prüfen, ob der Hash des Autors auch in der Liste der verifizierten Accounts enthalten ist.
+ \item Der Client SOLL prüfen, ob der Hash des Autors auch in der offiziellen Liste der verifizierten Accounts enthalten ist.
  \item Der Client SOLL prüfen, ob die Nachricht gültig gemäß der offiziellen Liste der registrierten Accounts vom Account-Server ist.
 \end{itemize}
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 
 public class Message {
 	
@@ -79,16 +80,16 @@ public class Message {
 		return author;
 	}
 	
-	public void send(PrintStream ps) throws KeyException {
+	public void send(PrintWriter ps) throws KeyException {
 		// make sure message ends with a new line
 		if(!message.endsWith("\n")) {
 			message = message + "\n";
 		}
 		String digest = Helper.computeDigest(message);
 		String signature = Helper.computeSignature(digest, author.getPublicKey());
-		ps.println("Author: "+Helper.computeHash(author.getPublicKey()));
-		ps.println("Digest: "+digest);
-		ps.println("Signature: "+signature);
+		ps.print("Author: "+Helper.computeHash(author.getPublicKey())+"\n");
+		ps.print("Digest: "+digest+"\n");
+		ps.print("Signature: "+signature+"\n");
 		ps.print(message); // message already contains newline
 	}
 }

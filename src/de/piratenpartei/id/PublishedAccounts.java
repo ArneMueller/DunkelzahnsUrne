@@ -52,12 +52,10 @@ public class PublishedAccounts {
 					if(buffer == null) throw new IllegalFormatException("[Line "+line+"] Expected \"Exponent:\"");
 					String exponent = Helper.read("Exponent", buffer);
 					PublicKey pk = Helper.readPublicKey(modulus,  exponent);
-					Helper.verifyKey(pk, hash);
+					//Helper.verifyKey(pk, hash); //we do this later, may reject complete list
 					accounts.put(hash, pk);
 					line++;
 				} catch (IllegalFormatException e) {
-					throw new IllegalFormatException("[Line "+line+"] "+e.getMessage(), e);
-				} catch (KeyException e) {
 					throw new IllegalFormatException("[Line "+line+"] "+e.getMessage(), e);
 				}
 			}

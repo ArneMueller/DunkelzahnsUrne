@@ -52,6 +52,6 @@ public class PrivateAccount extends Account {
 		PrintWriter pw = new PrintWriter(new OutputStreamWriter(out, Config.CHARSET));
 		m.send(pw);
 		*/
-		m.send(System.out);
+		m.send(new PrintWriter(System.out)); // dirty hack for testing
 	}
 }
