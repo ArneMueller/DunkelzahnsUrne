@@ -5,7 +5,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{fancyhdr}
-%\usepackage{graphicx}
+\usepackage{graphicx}
 \usepackage{geometry}
 \usepackage{enumerate}
 %\usepackage{listings}
@@ -202,8 +202,18 @@ Exponent: AQAB
 Der Akkreditierungsbrief ist ein auf Papier gedruckter Hash des öffentlichen Schlüssels. Konkret ist enthalten:
 \begin{itemize}
  \item Der \Base-codierte Hash
- \item Der Hash als QR-CODE (TODO:genauer)
+ \item Der \Base-codierte Hash in einem 2D-Barcode im \href{http://www.qrcode.com/en/qrstandard.html}{QR\_CODE}-Format mit ErrorCorrectionLevel H.
 \end{itemize}
+
+\paragraph{Beispiel: siehe Abbildung~\ref{fig:akkreditierungsbrief}}
+
+\begin{figure}[h]
+ \centering
+ \includegraphics[scale=0.2]{./account.pdf}
+ % account.pdf: 612x792 pixel, 72dpi, 21.59x27.94 cm, bb=0 0 612 792
+ \caption{Beispiel-Akkreditierungsbrief}
+ \label{fig:akkreditierungsbrief}
+\end{figure}
 
 
 \section{Verfahren} \label{sec:verfahren}
