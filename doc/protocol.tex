@@ -121,16 +121,29 @@ Sei $m$ die \Byte-Codierung des Modulus und sei $e$ die \Byte-Codierung des öff
 Der Hash des öffentlichen Schlüssels ist die \Base-Codierung des \SHA Hashes der Bytefolge $me$.
 
 \subsection{Liste registrierter Accounts}
+Die erste Zeile der Liste registrierter Accounts ist ``Account-Server: '' gefolgt von einem \Base-codierten Hash $h_l$. \\
+Die zweite und dritte Zeile der Liste registrierter Accounts ist die Codierung eines öffentlichen Schlüssels $p_l$.
+Die vierte Zeile der Liste registrierter Accounts ist ``Digest: '' gefolgt von einem \Base-codierten Digest $d_l$. \\
+Die fünfte Zeile der Liste registrierter Accounts ist ``Signature: '' gefolgt von einer \Base-codierten Signatur $s_l$. \\
+Danach folgen die Einträge der Liste.
+
 Jeder Eintrag der Liste registrierter Accounts besteht aus $3$ zusammenhängenden Zeilen. In der Liste registrierter Accounts sind nur solche Einträge enthalten.
 
 Die erste Zeile jedes Eintrages beginnt mit ``Hash: ''gefolgt von einem \Base-codierten Hash.
 Die zweite und dritte Zeile jedes Eintrages enthalten die Codierung eines öffentlichen Schlüssels.
+
+Die liste registrierter Accounts ist gültig, falls $d_l$ der Digest über die Einträge ist, $s_l$ decodiert mit dem öffentlichen Schlüssel $p_l$ den digest $d_l$ ergibt und $h_l$ der hash von $p_l$ ist.
 
 Jeder Hash eines gültigen Eintrages in einer Liste registrierter Accounts $L$ gilt als \emph{registriert nach $L$}. 
 Ein Eintrag mit Hash $h$ und öffentlichen Schlüssel $p$ ist gültig, falls der Hash von $p$ gleich $h$ ist.
 
 \paragraph{Beispiel}
 \begin{verbatim}
+Account-Server: hpO/rM/QjX07fGibrUbGtqr7+OcRFda5jaCn2xLpqdt4WmUYphmS/P4ON3GNofjh8fWpOKe+nxDD/zgDC3X6rQ==
+Modulus: AINYDQjkC6KAQAst9hkBVpVaXIOYbBSic8QMzNqjzNjIgmTxoPfOtLLwiOL3FhB5lfCTVxulZ15PAxc1AClrPJMCSX9V7e8HKWnmE+SEvaQjMiudUbHuasRcaFknsJRIlyZXhLR6DW1uR7NK574gIuyawChXHJIrqAfSnfw5JxIc2VRwbwUNAwS4sOd/pm7lsEJwP9LVnVvlm1UDRvA1BBs++4KGimUn7w85xPkVqQHPBsjAoPaQEEvoN8W6CnVg0FhuTGRQurQQeKXYRfcQINNEj/W0AnqkzLAwNBwW5HaLHFoqJgiE97HRtl/M6y/6RfDcL7iU8ikkZPKhVwf7DWaAlmiZpYhsNGPdvPfuDQ6ZglOnFSQA+53NJE5y18Au4xx+FI7yTrZak8tBKC4ysNwxcL74YFSntU/UbJvw5qvgCV5bFLCBVNeBLye9qWmBJTaAjJ01H2ymTcM4T6ed5MQdeZINwpDFdcmZo1zjuZU+4wm/SHWDC1WgITmO2CFWY+vIZKOCNduDRpRPCoXdaPZLMoHe1JdilPqiFmfOG6kJBYq37eQ5BhraEHxz6NH7nUe/InSmxl3zIiTTe+Yht7V5f4mc2RvqGPSP1gdtDyEupcrNDR43j/FES0CheEPdl6vexFNTJT3MfjKbmML8d6Ql1ptuqiQkBS0fctt/SFad
+Exponent: AQAB
+Digest: PXiH1qZOKEtCoV07j88e38USVok5ehtc7j6OvOy7oJGCGLibCzrvEE91V32cSQYvvSGBXU/f2Obxs4Zkcubk9g==
+Signature: CipK+znGV1Dg2S8srorhDTKLPX18EGYKaEAwvVBknUfgTlmgn69rd3vxy7xV+jJkp+8VRX9XW2PtAJBVNbF+LastUE9vadQeVXNyMhhFx0foRADa7FPGF6ZmUWA/FPGi3kX4LhxDum2wrxoo7CgV2MYVOH9nM2Lv+5l/68LLHY0UgkseEarzR+xjPrIfYkCfiKIXZNCg6ZqjT5v5RLjytvfl1IfiHa7ua0LXaa6OoD7jOZivM7s/UfSaZ9KhbjWu4eag7xwM5TX2/GxuuXM+v30notXFLG1BsSywgse1E2FG7TezZB3cc5eHtXYS3hkeiqmPrnoZitqD3XAwEVi1LxQFHZS3Lx2YLclnPB8FwIdvFnJOVmoJbJPN89U4J6Z1WksX9yxhi5isqkeU0/qejYp7BMdqMjY9ABoAB96T3I7EG91sPAT6QfBUjT0Wd/TSQNGx6HEjJKkCvZJAmzgr9Pjl4DNZj2flpmNJOHs07lePVOklIEnkOZ4RrpPEC0VzNbj5ME7ZCeDj0rzgR4OLYgzb5bDj8qjqOX5m9RMC23b9OVLPuzLoFz0fud/57C0wdePTgQkB8HuGm2yJ2XlQj1Tbmvp3S5p12a8qGkjB3mdcIR9zvQw5PD/0Xe+jm3gUpFZmIsnysnXBVXFcOve3+ssdvCsPzrAl0vOZrofv66U=
 Hash: ic/ZTBgESfPpRL6EnoOVEJNN5a4PvFNotQiIJAbZf7PxG8eseIn5nwshybMmT6W9ykIWzxQaOml7L2Q4VkwXPA==
 Modulus: AIR3IwoK65srUqdRJjDqJHaFPodRoNdYUMc+H3RfckyYLxs/YsLCcBXi8fh1h6kMLJR2+mWSo0GRAmfgh8iTCEUKDxq4VOH2ofU4P0MzY1+P1HtijdzssgfDgkkPp/fXlTReQyAC1Lzmscq2/lsDwADR7Erhxy2Ogy3NawvJOS4+uLwQXzTBcl94aJRk20zs6kyY15InVwCLDONIg/ywHXjC3F3gwhn2yzX/KoA2Lz785gznazv+f1vC4JnGSAyprykcTIuoVCkd7LR6Na45mJ8QRnKn0b+ZvphntWNOYKzk+AeZZX0Q5HgkzhtGbQcHO6TMoB8DqXW049aWOVM+jbx7hh8gF2lqLw42v94ESiU5pYRywlbX7oFtpMCPIneTnwG7HFhITA20HPnFi+5LClbNUq/abTFoaXG8eaFlv8bfaNLI0JPQkz25vpJ6geYHLy0O/tCxqGt3/9Sd3m8cz5VDf8RfwDJ9QQIG2Do0Ty40MnlCYHMP4kUfF1Gtq4S9vqgcPy8xYHaz9NqnjElkEPEhXiLip5Krbw9isebYUaKItayQ46hm6kFv7wBNZuST0etEwis0O2zy+eXsmzGo8DrD6PWe7FK1dZcV4d1kpCfMiuBnU8b4SBh8Q/bP4efI9XpMkea/T5wxTi8Rx0p8pclNSA2qudJVp3F5E4Prya75
 Exponent: AQAB
@@ -222,12 +235,13 @@ Der Account-Server verwaltet die offizielle Liste der registrierten Accounts, we
  \item Der Account-Server MUSS prüfen, ob $m$ eine gültige Account-Erstellungs-Nachricht ist.
  \item Ist $m$ eine gültige Account-Erstellungs-Nachricht, so MUSS der Account-Server in der offiziellen Liste der registrierten Accounts einen Eintrag unter dem Hash von $m$ mit dem Schlüssel von $m$ erstellen. Falls schon ein Eintrag mit dem Hash von $m$ existiert, so MUSS der existierende Eintrag überschrieben werden.
  \item Ist $m$ keine gültige Account-Erstellungs-Nachricht, so DARF die offizielle Liste der registrierten Accounts NICHT modifiziert werden.
+ \item Mit jedem neuen Eintrag muss der Account-Server auch die Signatur der Liste aktualisieren.
 \end{itemize}
 
 \paragraph{Begründung}
 Nachrichten müssen auf Gültigkeit geprüft werden, damit dritte nicht die Account-Details Fremder überschreiben.
 
-Durch den öffentlich sichtbaren Effekt der Nachricht (Aktualisierung der registrierten Accounts), ist keine weitere besondere Antwort-Nachricht nötig. Mmh... dann sollte diese offizielle Liste vom Account-Server signiert werden.
+Durch den öffentlich sichtbaren Effekt der Nachricht (Aktualisierung der registrierten Accounts), ist keine weitere besondere Antwort-Nachricht nötig.
 
 
 \subsection{Komponente: Client}
@@ -260,6 +274,8 @@ Dies macht der Client um die Nachrichten (z.B. Stimmabgaben anderer Nutzer auf i
  \item Der Client SOLL sich den Hash der offiziellen Liste der verifizierten Accounts besorgen (z.B. als Wahlbeobachter bei der Auszählung der Stimmzettel, oder über ein WebOfTrust)
  \item Der Client SOLL die offizielle Liste der verifizierten Accounts herunterladen und mit dem Hash auf Modifikationen überprüfen.
  \item Der Client SOLL prüfen, ob der Hash des Autors auch in der offiziellen Liste der verifizierten Accounts enthalten ist.
+ \item Der Client SOLL prüfen, ob die Liste der registrierten Accounts gültig ist.
+ \item Der Client SOLL prüfen, ob der Hash des Account-Servers mit einem lokal gespeicherten Hash übereinstimmt.
  \item Der Client SOLL prüfen, ob die Nachricht gültig gemäß der offiziellen Liste der registrierten Accounts vom Account-Server ist.
 \end{itemize}
 
