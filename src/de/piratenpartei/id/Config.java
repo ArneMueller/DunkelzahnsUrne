@@ -26,6 +26,8 @@ public class Config {
 	
 	public static final String legitimateChecksum = "8+2i9WyfduELKgVS99wgkCtdl5Asjjq7+4v2ghJsiou9Z7SPv83kCvNES+wOBRZAuFh2stAYLJct5Sw7PKEfpw==";
 	
+	public static final String accountServer = "hpO/rM/QjX07fGibrUbGtqr7+OcRFda5jaCn2xLpqdt4WmUYphmS/P4ON3GNofjh8fWpOKe+nxDD/zgDC3X6rQ==";
+	
 	public static final String HASH_ALGORITHM = "SHA-512";
 	public static final String SIGNATURE_ALGORITHM = "RSA/NONE/PKCS1Padding";
 	
