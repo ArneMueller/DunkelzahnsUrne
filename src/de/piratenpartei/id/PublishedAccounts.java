@@ -47,51 +47,16 @@ public class PublishedAccounts {
 		int line = 1;
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(Config.publishedAccounts.openStream(), Config.CHARSET));
-			String buffer = br.readLine();
-			String server_hash = Helper.read("Account-Server", buffer);
-			line++;
-			buffer = br.readLine();
-			String server_modulus = Helper.read("Modulus", buffer);
-			line++;
-			buffer = br.readLine();
-			String server_exponent = Helper.read("Exponent", buffer);
-			line++;
-			buffer = br.readLine();
-			String digest = Helper.read("Digest", buffer);
-			line++;
-			buffer = br.readLine();
-			String signature = Helper.read("Signature", buffer);
-			line++;
-			
-			PublicKey server_key = Helper.readPublicKey(server_modulus, server_exponent);
-			if(!server_hash.equals(Config.accountServer)) {
-				throw new IllegalFormatException("Presented hash of the Account-Server does not match to the internally stored hash of the server");
-			}
-			try {
-				Helper.verifyKey(server_key, server_hash);
-			} catch (KeyException e1) {
-				throw new IllegalFormatException("Key of the Account-Server does not match to the hash of the server");
-			}
-			try {
-				Helper.verifySignature(digest, signature, server_key);
-			} catch (KeyException e1) {
-				throw new IllegalFormatException("Signature of the registered accounts list does not decode to digest!");
-			}
-			
-			StringBuilder listText = new StringBuilder();
-			
+			String buffer;
 			while((buffer = br.readLine()) != null) {
 				try {
-					listText.append(buffer + "\n");
 					String hash = Helper.read("Hash", buffer);
 					line++;
 					buffer = br.readLine();
-					listText.append(buffer + "\n");
 					if(buffer == null) throw new IllegalFormatException("[Line "+line+"] Expected \"Modulus:\"");
 					String modulus = Helper.read("Modulus", buffer);
 					line++;
 					buffer = br.readLine();
-					listText.append(buffer + "\n");
 					if(buffer == null) throw new IllegalFormatException("[Line "+line+"] Expected \"Exponent:\"");
 					String exponent = Helper.read("Exponent", buffer);
 					PublicKey pk = Helper.readPublicKey(modulus,  exponent);
@@ -102,13 +67,6 @@ public class PublishedAccounts {
 					throw new IllegalFormatException("[Line "+line+"] "+e.getMessage(), e);
 				}
 			}
-			
-			String computed_digest = Helper.computeDigest(listText.toString());
-			if(!digest.equals(computed_digest)) {
-				//TODO: comment the following line in as soon as we have a proper server.
-				//throw new IllegalFormatException("Digest does not match to list. Maybe the list got manipulated?");
-			}
-			
 		} catch (IOException e) {
 			throw new IOException("[Line "+line+"] Failed to read", e);
 		}

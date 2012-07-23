@@ -234,5 +234,4 @@ public class Helper {
 		if(textSplit.length != 2) throw new IllegalFormatException("String after \""+identifier+":\" must contain no \":\"");
 		return textSplit[1].trim();
 	}
-	
 }
