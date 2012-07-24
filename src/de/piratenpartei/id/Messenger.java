@@ -2,26 +2,43 @@ package de.piratenpartei.id;
 
 import java.io.*;
 
+import net.sf.json.JSONObject;
+
 public class Messenger {
 	private PrintWriter outputStream;
 	private Account author;
-	private Message m;
 	
 	public Messenger(Account author){
-		m = new Message(author);
+		this.author = author;
 	}
 	
 	public void message(String s) throws IOException, IllegalFormatException, KeyException, VerificationException{
-		this.m.setMessage(s);
-		this.m.send(this.outputStream);
+		Message m = new Message(this.author);
+		m.setMessage(s);
+		m.send(this.outputStream);
 	}
 	public void sendVote(IniTopic topic, String vote, String type) throws IOException, IllegalFormatException, KeyException, VerificationException{
-		this.message("vote:{type:\"" + type + "\",topic:\"" + topic.getID() + "\",vote:\"" + vote + "\"");
+		net.sf.json.JSONObject jo1 = new JSONObject();
+		net.sf.json.JSONObject jo2 = new JSONObject();
+		jo1.accumulate("type",type);
+		jo1.accumulate("vote", vote);
+		jo1.accumulate("topic", topic.getID());
+		jo2.accumulate("vote", jo1);
+		this.message(jo2.toString());
 	}
 	public void sendMessageToUser(String userName, String message) throws IOException, IllegalFormatException, KeyException, VerificationException{
-		this.message("userMsg:{to:\"" + userName + "\",message:\"" + message + "\"}");
+		net.sf.json.JSONObject jo1 = new JSONObject();
+		net.sf.json.JSONObject jo2 = new JSONObject();
+		jo1.accumulate("userName",userName);
+		jo1.accumulate("message",message);
+		jo2.accumulate("userMsg", jo1);
+		this.message(jo2.toString());
 	}
 	public void sendNickchange(String newNick) throws IOException, IllegalFormatException, KeyException, VerificationException{
-		this.message("nickChange:{newNick:\"" + newNick + "\"}");
+		net.sf.json.JSONObject jo1 = new JSONObject();
+		net.sf.json.JSONObject jo2 = new JSONObject();
+		jo1.accumulate("newNick", newNick);
+		jo2.accumulate("nickChange", jo1);
+		this.message(jo2.toString());
 	}
 }

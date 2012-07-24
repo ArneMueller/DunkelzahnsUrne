@@ -1,6 +1,10 @@
 package de.piratenpartei.id;
 
 import java.util.*;
+import net.sf.*;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
 
 /*
  * Implements a three-level tree, first level and second level
@@ -30,7 +34,8 @@ public class IniTree {
 	 * @param val parameter given to setInis
 	 */
 	public IniTree(String val){
-		this.setCategories(val);
+		net.sf.json.JSONObject jo = (JSONObject) JSONSerializer.toJSON(val);
+		
 	}
 
 	public LinkedList<String> getCaptions() {
@@ -70,12 +75,4 @@ public class IniTree {
 		this.categories = inis;
 	}
 	
-	public void setCategories(String s) {
-		// TODO
-		/*
-		 * Idee: JSON-Parser oder XML-Parser
-		 * Vorteil JSON: kenn ich besser
-		 * Vorteil XML: wird bereits für das Krypto-Zeug verwendet, wär konsequenter
-		 */
-	}
 }
