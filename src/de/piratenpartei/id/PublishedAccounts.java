@@ -46,7 +46,7 @@ public class PublishedAccounts {
 		accounts = new HashMap<String,PublicKey>();
 		int line = 1;
 		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(Config.publishedAccounts.openStream(), Config.CHARSET));
+			BufferedReader br = new BufferedReader(new InputStreamReader(Config.getPublishedAccounts().openStream(), Config.CHARSET));
 			String buffer = br.readLine();
 			String server_hash = Helper.read("Account-Server", buffer);
 			line++;
@@ -64,7 +64,7 @@ public class PublishedAccounts {
 			line++;
 			
 			PublicKey server_key = Helper.readPublicKey(server_modulus, server_exponent);
-			if(!server_hash.equals(Config.accountServer)) {
+			if(!server_hash.equals(Config.getAccountServer())) {
 				throw new IllegalFormatException("Presented hash of the Account-Server does not match to the internally stored hash of the server");
 			}
 			try {

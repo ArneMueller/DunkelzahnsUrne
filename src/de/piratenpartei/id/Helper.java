@@ -1,13 +1,19 @@
 package de.piratenpartei.id;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -235,4 +241,28 @@ public class Helper {
 		return textSplit[1].trim();
 	}
 	
+	/**
+	 * Creates a new empty Keystore. 
+	 * If a keystore already existed, the old keystore is overwritten.
+	 * @param password the password with which to protect the keystore.
+	 * @throws KeyException
+	 */
+	public static void initKeyStore(char[] password) throws KeyException {
+		try {
+			KeyStore ks = KeyStore.getInstance(Config.getKeyStoreType(), Config.getProvider());
+			ks.load(null, null); // initialized default KeyStore
+			ks.store(new FileOutputStream(Config.getKeyStore()), password);
+		} catch (KeyStoreException e) {
+			throw new RuntimeException(e);
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		} catch (CertificateException e) {
+			throw new RuntimeException(e);
+		} catch (FileNotFoundException e) {
+			throw new KeyException("Cannot create KeyStore", e);
+		} catch (IOException e) {
+			throw new KeyException("Cannot create KeyStore", e);
+		}
+	}
+
 }

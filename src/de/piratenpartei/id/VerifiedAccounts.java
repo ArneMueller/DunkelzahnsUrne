@@ -41,7 +41,7 @@ public class VerifiedAccounts {
 		int line = 0;
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			InputStream in = Config.verifiedAccounts.openStream();
+			InputStream in = Config.getVerifiedAccounts().openStream();
 			int read = 0;
 			byte[] buffer = new byte[1024]; // read 1KB chunks
 			do {
@@ -54,7 +54,7 @@ public class VerifiedAccounts {
 			byte[] digest = md.digest(baos.toByteArray());
 			String base64 = Base64.encodeBase64String(digest);
 			System.out.println(base64);
-			if(!base64.equals(Config.legitimateChecksum)) {
+			if(!base64.equals(Config.getLegitimateChecksum())) {
 				//throw new VerificationException("Checksumme für Liste mit legitimierten Accounts stimmt nicht!");
 				//TODO: Must throw an exception. But for developing purposes a simple string is easier.
 				System.out.println("Checksumme für Liste mit legitimierten Accounts stimmt nicht!");
