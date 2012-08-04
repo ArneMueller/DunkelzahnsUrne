@@ -101,11 +101,11 @@ public class Config {
 	}
 	
 	public static String getLegitimateChecksum() {
-		return INSTANCE.get("legitimateChecksum");
+		return INSTANCE.get("legitimateChecksum"); //TODO: THIS IS NOT SAFE!
 	}
 	
 	public static String getAccountServer() {
-		return INSTANCE.get("accountServer");
+		return INSTANCE.get("accountServer"); //TODO: THIS IS NOT SAFE!
 	}
 	
 	public static URL getPublishedAccounts() {
