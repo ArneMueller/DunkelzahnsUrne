@@ -17,11 +17,11 @@ public class Messenger {
 		m.setMessage(s);
 		m.send(this.outputStream);
 	}
-	public void sendVote(IniTopic topic, String vote, String type) throws IOException, IllegalFormatException, KeyException, VerificationException{
+	public void sendVote(IniTopic topic, Vote vote, String type) throws IOException, IllegalFormatException, KeyException, VerificationException{
 		net.sf.json.JSONObject jo1 = new JSONObject();
 		net.sf.json.JSONObject jo2 = new JSONObject();
 		jo1.accumulate("type",type);
-		jo1.accumulate("vote", vote);
+		jo1.accumulate("vote", vote.toJSON());
 		jo1.accumulate("topic", topic.getID());
 		jo2.accumulate("vote", jo1);
 		this.message(jo2.toString());

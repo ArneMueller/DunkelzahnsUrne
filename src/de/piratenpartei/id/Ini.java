@@ -3,7 +3,7 @@ package de.piratenpartei.id;
 public class Ini {
 	private String caption;
 	private String text;
-	private String ownVote;
+	private int idCode;
 	
 	public String getCaption() {
 		return caption;
@@ -17,11 +17,7 @@ public class Ini {
 	public void setText(String text) {
 		this.text = text;
 	}
-	public String getOwnVote() {
-		return ownVote;
+	public int getIdCode(){
+		return this.idCode;
 	}
-	public void setOwnVote(String ownVote) {
-		this.ownVote = ownVote;
-	}
-
 }

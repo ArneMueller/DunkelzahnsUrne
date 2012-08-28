@@ -33,13 +33,13 @@ public class IniCategory implements TreeElement {
 		return caption;
 	}
 
-	public void setCaption(String caption) {
-		this.caption = caption;
-	}
-
 	@Override
 	public String getID() {
 		return idPrefix + String.valueOf(this.idcode);
+	}
+
+	public void addIni(Ini ini, int top) {
+		this.topics.get(top).addIni(ini);		
 	}
 
 }

@@ -1,10 +1,7 @@
 package de.piratenpartei.id;
 
 import java.util.*;
-import net.sf.*;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
+import net.sf.json.*;
 
 /*
  * Implements a three-level tree, first level and second level
@@ -16,63 +13,37 @@ public class IniTree {
 	
 	/**
 	 * default constructor
+	 * @param cats IniCategories to use
 	 */
-	public IniTree(){
-		this.categories = null;
+	public IniTree(LinkedList<IniCategory> cats){
+		this.categories = cats;
 	}
 
 	/**
-	 * constructor with "setCategories(LinkedList<IniCategory>)" included
-	 * @param val parameter given to setInis
+	 * constructor with "setCategories(JSONObject)" included
+	 * @param jo JSONObject to Parse
 	 */
-	public IniTree(LinkedList<IniCategory> val){
-		this.setCategories(val);
+	public IniTree(JSONObject jo){
+		int i=0;
+		String key = "category" + String.valueOf(i);
+		while(jo.has(key)){
+			this.categories.add((IniCategory) jo.get(key));
+			jo.discard(key);
+			i++;
+			key = "category" + String.valueOf(i);
+		}
 	}
 
-	/**
-	 * constructor with "setCategories(String)" included
-	 * @param val parameter given to setInis
-	 */
-	public IniTree(String val){
-		net.sf.json.JSONObject jo = (JSONObject) JSONSerializer.toJSON(val);
-		
-	}
-
-	public LinkedList<String> getCaptions() {
+	public LinkedList<String> getCategoryCaptions() {
 		LinkedList<String> l = new LinkedList<String>();
 		for (int i = 0; i < l.size(); i++) {
 			l.add(this.categories.get(i).getCaption());
 		}
 		return l;
 	}
-
-	/**
-	 * Returns the IniTopic at Index topIndex in the IniCategory at catIndex
-	 * @param catIndex index of the IniCategory of the return value
-	 * @param topIndex index of the return value in its IniCategory
-	 * @return the found IniTopic
-	 */
-	public IniTopic getTopic(int catIndex, int topIndex){
-		return this.categories.get(catIndex).getTopic(topIndex);
-	}
 	
-	/**
-	 * Returns the IniTopic at Index topIndex in the IniCategory at catIndex
-	 * @param catIndex index of the IniCategory of the return value
-	 * @param topIndex index of the IniTopic of the return value
-	 * @param iniIndex index of the return value in its IniTopic
-	 * @return the found Ini
-	 */
-	public Ini getIni(int catIndex, int topIndex, int iniIndex){
-		return this.categories.get(catIndex).getIni(topIndex,iniIndex);
-	}
-	
-	public LinkedList<IniCategory> getCategories() {
-		return categories;
+	public void AddIni(Ini ini, int cat, int top){
+		this.categories.get(cat).addIni(ini, top);
 	}
 
-	public void setCategories(LinkedList<IniCategory> inis) {
-		this.categories = inis;
-	}
-	
 }
