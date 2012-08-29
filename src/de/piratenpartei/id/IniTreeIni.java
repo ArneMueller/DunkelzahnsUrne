@@ -1,6 +1,6 @@
 package de.piratenpartei.id;
 
-public class Ini {
+public class IniTreeIni {
 	private String caption;
 	private String text;
 	private int idCode;

@@ -9,13 +9,13 @@ import net.sf.json.*;
  */
 
 public class IniTree {
-	private LinkedList<IniCategory> categories;
+	private LinkedList<IniTreeCategory> categories;
 	
 	/**
 	 * default constructor
 	 * @param cats IniCategories to use
 	 */
-	public IniTree(LinkedList<IniCategory> cats){
+	public IniTree(LinkedList<IniTreeCategory> cats){
 		this.categories = cats;
 	}
 
@@ -27,7 +27,7 @@ public class IniTree {
 		int i=0;
 		String key = "category" + String.valueOf(i);
 		while(jo.has(key)){
-			this.categories.add((IniCategory) jo.get(key));
+			this.categories.add((IniTreeCategory) jo.get(key));
 			jo.discard(key);
 			i++;
 			key = "category" + String.valueOf(i);
@@ -42,7 +42,7 @@ public class IniTree {
 		return l;
 	}
 	
-	public void AddIni(Ini ini, int cat, int top){
+	public void AddIni(IniTreeIni ini, int cat, int top){
 		this.categories.get(cat).addIni(ini, top);
 	}
 

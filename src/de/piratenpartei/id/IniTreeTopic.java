@@ -2,14 +2,14 @@ package de.piratenpartei.id;
 
 import java.util.*;
 
-public class IniTopic implements TreeElement {
-	private LinkedList<Ini> inis;
+public class IniTreeTopic implements TreeElement {
+	private LinkedList<IniTreeIni> inis;
 	private String caption;
 	private int idcode;
 	private int status;	// 0: closed; 1: discussion; 2: frozen; 3: voting
 	private static String idPrefix = "INI";
 
-	public IniTopic(int idcode){
+	public IniTreeTopic(int idcode){
 		this.idcode = idcode;
 	}
 	@Override
@@ -21,15 +21,15 @@ public class IniTopic implements TreeElement {
 		return l;
 	}
 
-	public LinkedList<Ini> getInis() {
+	public LinkedList<IniTreeIni> getInis() {
 		return inis;
 	}
 
-	public void setInis(LinkedList<Ini> inis) {
+	public void setInis(LinkedList<IniTreeIni> inis) {
 		this.inis = inis;
 	}
 
-	public Ini getIni(int iniIndex) {
+	public IniTreeIni getIni(int iniIndex) {
 		return this.inis.get(iniIndex);
 	}
 
@@ -44,7 +44,7 @@ public class IniTopic implements TreeElement {
 	public String getID() {
 		return idPrefix + String.valueOf(this.idcode);
 	}
-	public void addIni(Ini ini) {
+	public void addIni(IniTreeIni ini) {
 		this.inis.add(ini);
 	}
 	public int getStatus() {

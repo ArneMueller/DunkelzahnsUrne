@@ -2,13 +2,13 @@ package de.piratenpartei.id;
 import java.util.LinkedList;
 
 
-public class IniCategory implements TreeElement {
-	private LinkedList<IniTopic> topics;
+public class IniTreeCategory implements TreeElement {
+	private LinkedList<IniTreeTopic> topics;
 	private String caption;
 	private static String idPrefix = "CAT";
 	private int idcode;
 	
-	public IniCategory(int idcode){
+	public IniTreeCategory(int idcode){
 		this.idcode = idcode;
 	}
 	
@@ -21,11 +21,11 @@ public class IniCategory implements TreeElement {
 		return l;
 	}
 
-	public Ini getIni(int topIndex, int iniIndex) {
+	public IniTreeIni getIni(int topIndex, int iniIndex) {
 		return this.topics.get(topIndex).getIni(iniIndex);
 	}
 
-	public IniTopic getTopic(int topIndex){
+	public IniTreeTopic getTopic(int topIndex){
 		return this.topics.get(topIndex);
 	}
 
@@ -38,7 +38,7 @@ public class IniCategory implements TreeElement {
 		return idPrefix + String.valueOf(this.idcode);
 	}
 
-	public void addIni(Ini ini, int top) {
+	public void addIni(IniTreeIni ini, int top) {
 		this.topics.get(top).addIni(ini);		
 	}
 
