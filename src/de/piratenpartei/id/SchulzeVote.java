@@ -1,29 +1,25 @@
 package de.piratenpartei.id;
 
-import net.sf.json.JSONObject;
 import java.util.*;
 
+/**
+ * 
+ * Implementation of the Schulze voting procedure.
+ * votes = { index of ini with highest priority , index of ini with second-highest priority , ... }
+ * @author artus
+ *
+ */
 public class SchulzeVote extends Vote {
-	LinkedList<Integer> votes;
-	
-	@Override
-	public JSONObject toJSON() {
-		JSONObject jo = new JSONObject();
-		for(int i=0; i<this.votes.size(); i++){
-			jo.accumulate("vote" + String.valueOf(i), votes.get(i));
-		}
-		return jo;
+	private ArrayList<Integer> votes;
+
+	public ArrayList<Integer> getVotes() {
+		return votes;
 	}
 
-	@Override
-	public void setData(JSONObject jo) {
-		int i=0;
-		while(!jo.isEmpty()){
-			String key = "vote" + String.valueOf(i); 
-			jo.get(key);
-			jo.discard(key);
-			i++;
-		}
+	public void setVotes(ArrayList<Integer> votes) {
+		this.votes = votes;
 	}
+	
+	
 
 }

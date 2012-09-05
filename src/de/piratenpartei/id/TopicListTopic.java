@@ -11,11 +11,16 @@ public class TopicListTopic {
 		this.inis = new ArrayList<TopicListIni>();
 	}
 
-	public void addTag(String tag){
-		this.getTags().add(tag);
+	public void vote(Vote v){
+		
 	}
+	
+	public void addTag(String tag){
+		this.tags.add(tag);
+	}
+	
 	public void addIni(TopicListIni ini){
-		this.getInis().add(ini);
+		this.inis.add(ini);
 	}
 	
 	// Setters and Getters

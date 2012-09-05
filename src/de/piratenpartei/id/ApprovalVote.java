@@ -2,28 +2,22 @@ package de.piratenpartei.id;
 
 import java.util.LinkedList;
 
-import net.sf.json.JSONObject;
-
+/**
+ * 
+ * Implementation of the Approval voting procedure.
+ * An Approval Vote with list length 1 is equivalent to a simple yes/no vote.
+ * @author Dunkelzahn
+ *
+ */
 public class ApprovalVote extends Vote {
-	LinkedList<Boolean> votes;
-	
-	@Override
-	public JSONObject toJSON() {
-		JSONObject jo = new JSONObject();
-		for(int i=0; i<votes.size(); i++){
-			jo.accumulate("vote" + String.valueOf(i), votes.get(i));
-		}
-		return jo;
+	private LinkedList<Boolean> votes;
+
+	public LinkedList<Boolean> getVotes() {
+		return votes;
 	}
 
-	@Override
-	public void setData(JSONObject jo) {
-		int i=0;
-		while(!jo.isEmpty()){
-			String key = "vote" + String.valueOf(i);
-			votes.add(jo.getBoolean(key));
-			jo.discard(key);
-			i++;
-		}
+	public void setVotes(LinkedList<Boolean> votes) {
+		this.votes = votes;
 	}
+	
 }

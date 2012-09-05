@@ -5,12 +5,16 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JToolBar;
 import java.awt.BorderLayout;
+import java.io.IOException;
+
 import javax.swing.JList;
 
 public class GUI {
 
 	private JFrame frame;
 	private VAOV v;
+	private char[] pass;
+	private char[] accountName;
 
 	/**
 	 * Launch the application.
@@ -33,7 +37,26 @@ public class GUI {
 	 */
 	public GUI() {
 		initialize();
-		 v = new VAOV();
+		
+		this.queryAccount();
+		this.cryptInit();
+		
+		try {
+			v = new VAOV(accountName, pass);
+			overwrite(pass);
+		} catch(IOException e){
+			 throw new RuntimeException(e);
+		}
+	}
+
+	private void cryptInit() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void queryAccount() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
