@@ -9,7 +9,7 @@ import java.util.*;
  * @author artus
  *
  */
-public class SchulzeVote extends Vote {
+public class SchulzeVote implements Vote {
 	private ArrayList<Integer> votes;
 
 	public ArrayList<Integer> getVotes() {

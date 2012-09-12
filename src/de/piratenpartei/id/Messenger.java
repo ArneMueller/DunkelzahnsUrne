@@ -10,6 +10,12 @@ public class Messenger {
 	
 	public Messenger(Account author){
 		this.author = author;
+		this.outputStream = new PrintWriter(System.out);
+	}
+	
+	public Messenger(Account author, String outputPath) throws FileNotFoundException{
+		this.author = author;
+		this.outputStream = new PrintWriter(outputPath);
 	}
 	
 	public void sendMessage(String s) throws IOException, IllegalFormatException, KeyException, VerificationException{

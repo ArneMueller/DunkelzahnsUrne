@@ -9,7 +9,7 @@ import java.util.LinkedList;
  * @author Dunkelzahn
  *
  */
-public class ApprovalVote extends Vote {
+public class ApprovalVote implements Vote {
 	private LinkedList<Boolean> votes;
 
 	public LinkedList<Boolean> getVotes() {
