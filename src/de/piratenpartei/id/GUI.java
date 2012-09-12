@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JToolBar;
 import java.awt.BorderLayout;
 import java.io.IOException;
+import java.security.KeyStore;
 
 import javax.swing.JList;
 
@@ -13,8 +14,8 @@ public class GUI {
 
 	private JFrame frame;
 	private VAOV v;
-	private char[] pass;
 	private char[] accountName;
+	private KeyStore keystore;
 
 	/**
 	 * Launch the application.
@@ -38,25 +39,24 @@ public class GUI {
 	public GUI() {
 		initialize();
 		
-		this.queryAccount();
+		Account a = this.queryAccount();
 		this.cryptInit();
 		
 		try {
-			v = new VAOV(accountName, pass);
-			overwrite(pass);
+			v = new VAOV(a);
 		} catch(IOException e){
 			 throw new RuntimeException(e);
 		}
 	}
 
 	private void cryptInit() {
-		// TODO Auto-generated method stub
+		// TODO
+		//Helper.initKeyStore(password)
 		
 	}
 
-	private void queryAccount() {
-		// TODO Auto-generated method stub
-		
+	private Account queryAccount() {
+		return null;
 	}
 
 	/**

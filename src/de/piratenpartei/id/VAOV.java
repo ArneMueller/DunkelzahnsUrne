@@ -19,11 +19,11 @@ public class VAOV {
 	 * 
 	 * @throws IOException 
 	 */
-	public VAOV(char[] accountName, char[] password) throws IOException {
+	public VAOV(Account a) throws IOException {
 		this.buildTopicList();
 		System.out.println("Building inis finished");
 		
-		m = new Messenger(null); // TODO
+		m = new Messenger(a); // TODO
 	}
 
 	/**
