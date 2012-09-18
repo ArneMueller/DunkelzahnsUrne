@@ -10,13 +10,13 @@ import java.util.*;
  *
  */
 public class SchulzeVote implements Vote {
-	private ArrayList<Integer> votes;
+	private List<Integer> votes;
 
-	public ArrayList<Integer> getVotes() {
+	public List<Integer> getVotes() {
 		return votes;
 	}
 
-	public void setVotes(ArrayList<Integer> votes) {
+	public void setVotes(List<Integer> votes) {
 		this.votes = votes;
 	}
 	

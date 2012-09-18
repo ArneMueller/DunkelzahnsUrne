@@ -1,6 +1,6 @@
 package de.piratenpartei.id;
 
-import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 
@@ -10,13 +10,13 @@ import java.util.LinkedList;
  *
  */
 public class ApprovalVote implements Vote {
-	private LinkedList<Boolean> votes;
+	private List<Boolean> votes;
 
-	public LinkedList<Boolean> getVotes() {
+	public List<Boolean> getVotes() {
 		return votes;
 	}
 
-	public void setVotes(LinkedList<Boolean> votes) {
+	public void setVotes(List<Boolean> votes) {
 		this.votes = votes;
 	}
 	

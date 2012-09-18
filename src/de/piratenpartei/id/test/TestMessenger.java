@@ -11,8 +11,11 @@ import org.junit.Test;
 
 public class TestMessenger {
 
+	public static void main(String[] args){
+		test();
+	}
 	@Test
-	public void test() {
+	public static void test() {
 		PrivateAccount pa;
 		try {
 			pa = new PrivateAccount();
@@ -21,6 +24,7 @@ public class TestMessenger {
 			System.out.println("successful");
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println(e.getMessage());
 			throw new RuntimeException();
 		}
 	}

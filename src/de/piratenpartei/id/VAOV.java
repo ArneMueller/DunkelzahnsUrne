@@ -3,7 +3,7 @@ package de.piratenpartei.id;
 import java.io.IOException; 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import net.sf.json.*;
+import org.json.simple.*;
 
 /**
  * 
@@ -44,18 +44,18 @@ public class VAOV {
 		String s = "";
 		s = loadInis();
 		
-		JSONObject jo = (JSONObject) JSONSerializer.toJSON(s);
+		TextStore ts = new TextStore(s);
 
-		String structure = (String) jo.get("structure");
-		if(structure == "list") inis = (TopicList) jo.get("data");
+		String structure = (String) ts.get("structure");
+		if(structure == "list") inis = (TopicList) ts.get("data");
 		else throw new RuntimeException("Structure property in JOSN-file has unknown value.");		
 	}
 	
-	public void addIniInNewTopic(TopicListIni ini, ArrayList<String> tags){
+	public void addIniInNewTopic(Ini ini, ArrayList<String> tags){
 		this.inis.addIniInNewTopic(ini, tags);
 	}
 	
-	public void addIniToTopic(TopicListIni ini, int topicIndex){
+	public void addIniToTopic(Ini ini, int topicIndex){
 		this.inis.addIniToTopic(ini, topicIndex);
 	}
 	
