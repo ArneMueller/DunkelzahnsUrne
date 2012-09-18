@@ -1,6 +1,8 @@
 package de.piratenpartei.id;
 
+import java.io.BufferedReader;
 import java.io.IOException; 
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import org.json.simple.*;
@@ -14,6 +16,7 @@ import org.json.simple.*;
 public class VAOV {
 	private TopicList inis;
 	private Messenger m;
+	public static final String readPath = "data.dat";
 	
 	/**
 	 * 
@@ -47,8 +50,8 @@ public class VAOV {
 		TextStore ts = new TextStore(s);
 
 		String structure = (String) ts.get("structure");
-		if(structure == "list") inis = (TopicList) ts.get("data");
-		else throw new RuntimeException("Structure property in JOSN-file has unknown value.");		
+		if(structure.equals("list")) inis = new TopicList((JSONObject) ts.get("data"));
+		else throw new RuntimeException("Structure property in JOSN-file has unknown value:" + structure);		
 	}
 	
 	public void addIniInNewTopic(Ini ini, ArrayList<String> tags){
@@ -60,21 +63,14 @@ public class VAOV {
 	}
 	
 	public String loadInis() throws IOException{
-		return loadInisFromFile("data.dat");
-	}
-	
-	public String loadInisFromFile(String path) throws IOException{
-		LinkedList<String> list = new LinkedList<String>();
-		
-		java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(path));
+		BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(readPath));
+
 		String s;
-		while((s = br.readLine()) != null) list.add(s);
-		br.close();
-		
 		String result = "";
-		while(!list.isEmpty()) result += list.pop();
+		while((s = br.readLine()) != null) result += s;
+		br.close();
 		
 		return result;
 	}
-
+	
 }

@@ -2,6 +2,8 @@ package de.piratenpartei.id.test;
 
 import static org.junit.Assert.*;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import org.json.simple.*;
@@ -44,7 +46,20 @@ public class TestTopicList {
 		assertTrue(tl.getTopics().get(0).getInis().get(1).getText().equals(texts.get(1)));
 		
 		JSONObject jo = tl.toJSON();
+		JSONObject jo2 = jo;
+		jo = new JSONObject();
+		jo.put("structure", "list");
+		jo.put("data", jo2);
 		System.out.println(jo);
+		try {
+			PrintWriter out = new PrintWriter("data.dat");
+			out.println(jo);
+			out.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			assertTrue(false);
+		}
 		tl = new TopicList(jo);
 
 		assertTrue(tl.getCategories().equals(tags));
