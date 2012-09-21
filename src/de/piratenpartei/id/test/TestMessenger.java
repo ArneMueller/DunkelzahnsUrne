@@ -11,11 +11,8 @@ import org.junit.Test;
 
 public class TestMessenger {
 
-	public static void main(String[] args){
-		test();
-	}
 	@Test
-	public static void test() {
+	public void test() {
 		PrivateAccount pa;
 		try {
 			pa = new PrivateAccount();

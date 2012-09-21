@@ -22,6 +22,7 @@ public class Messenger {
 		Message m = new Message(this.author);
 		m.setMessage(s);
 		m.send(this.outputStream);
+		this.outputStream.flush();
 	}
 
 	public void sendVote(int topicID, Vote vote, String type) throws IOException, IllegalFormatException, KeyException, VerificationException{
